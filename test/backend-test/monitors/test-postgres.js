@@ -13,7 +13,7 @@ describe(
         test("check() sets status to UP when Postgres server is reachable", async () => {
             // The default timeout of 30 seconds might not be enough for the container to start
             const postgresContainer = await new PostgreSqlContainer("postgres:latest")
-                .withStartupTimeout(60000)
+                .withStartupTimeout(120000)
                 .start();
             const postgresMonitor = new PostgresMonitorType();
             const monitor = {

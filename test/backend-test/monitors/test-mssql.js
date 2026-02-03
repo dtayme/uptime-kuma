@@ -12,7 +12,7 @@ async function createAndStartMSSQLContainer() {
     const container = await new MSSQLServerContainer("mcr.microsoft.com/mssql/server:2022-latest")
         .acceptLicense()
         // The default timeout of 30 seconds might not be enough for the container to start
-        .withStartupTimeout(60000)
+        .withStartupTimeout(120000)
         .start();
 
     return {

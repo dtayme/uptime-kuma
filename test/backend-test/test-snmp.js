@@ -12,7 +12,10 @@ describe("SNMPMonitorType", () => {
             skip: !!process.env.CI && (process.platform !== "linux" || process.arch !== "x64"),
         },
         async () => {
-            const container = await new GenericContainer("polinux/snmpd").withExposedPorts("161/udp").start();
+            const container = await new GenericContainer("polinux/snmpd")
+                .withExposedPorts("161/udp")
+                .withStartupTimeout(120000)
+                .start();
 
             try {
                 // Get the mapped UDP port

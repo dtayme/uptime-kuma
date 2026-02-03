@@ -5,6 +5,53 @@ const mqtt = require("mqtt");
 const { MqttMonitorType } = require("../../../server/monitor-types/mqtt");
 const { UP, PENDING } = require("../../../src/util");
 
+const MQTT_READY_TIMEOUT_MS = 60000;
+const MQTT_READY_RETRY_DELAY_MS = 1000;
+const MQTT_READY_CONNECT_TIMEOUT_MS = 5000;
+
+async function waitForMqttReady(connectionString) {
+    const deadline = Date.now() + MQTT_READY_TIMEOUT_MS;
+    let lastError = null;
+
+    while (Date.now() < deadline) {
+        try {
+            await new Promise((resolve, reject) => {
+                const client = mqtt.connect(connectionString, {
+                    reconnectPeriod: 0,
+                    connectTimeout: MQTT_READY_CONNECT_TIMEOUT_MS,
+                });
+
+                const timeout = setTimeout(() => {
+                    client.end(true);
+                    reject(new Error("MQTT broker connection attempt timed out"));
+                }, MQTT_READY_CONNECT_TIMEOUT_MS);
+
+                const cleanup = (err) => {
+                    clearTimeout(timeout);
+                    client.end(true, () => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
+                    });
+                };
+
+                client.once("connect", () => cleanup());
+                client.once("error", (error) => cleanup(error));
+            });
+
+            return;
+        } catch (error) {
+            lastError = error;
+            await new Promise((resolve) => setTimeout(resolve, MQTT_READY_RETRY_DELAY_MS));
+        }
+    }
+
+    const message = lastError ? `${lastError.message}` : "MQTT broker did not become ready in time";
+    throw new Error(message);
+}
+
 /**
  * Runs an MQTT test with the
  * @param  {string} mqttSuccessMessage the message that the monitor expects
@@ -23,8 +70,9 @@ async function testMqtt(
     publishTopic = "test",
     conditions = null
 ) {
-    const hiveMQContainer = await new HiveMQContainer().start();
+    const hiveMQContainer = await new HiveMQContainer().withStartupTimeout(120000).start();
     const connectionString = hiveMQContainer.getConnectionString();
+    await waitForMqttReady(connectionString);
     const mqttMonitorType = new MqttMonitorType();
     const monitor = {
         jsonPath: "firstProp", // always return firstProp for the json-query monitor
@@ -45,20 +93,47 @@ async function testMqtt(
         status: PENDING,
     };
 
-    const testMqttClient = mqtt.connect(hiveMQContainer.getConnectionString());
-    testMqttClient.on("connect", () => {
-        testMqttClient.subscribe(monitorTopic, (error) => {
-            if (!error) {
-                testMqttClient.publish(publishTopic, receivedMessage);
-            }
-        });
+    const testMqttClient = mqtt.connect(connectionString, {
+        reconnectPeriod: 0,
+        connectTimeout: MQTT_READY_CONNECT_TIMEOUT_MS,
     });
+    const publishPromise = new Promise((resolve, reject) => {
+        const onError = (error) => {
+            testMqttClient.removeListener("connect", onConnect);
+            reject(error);
+        };
+        const onConnect = () => {
+            testMqttClient.subscribe(monitorTopic, (error) => {
+                if (error) {
+                    onError(error);
+                    return;
+                }
+                testMqttClient.publish(publishTopic, receivedMessage, { retain: true }, (publishError) => {
+                    if (publishError) {
+                        onError(publishError);
+                        return;
+                    }
+                    resolve();
+                });
+            });
+        };
+        testMqttClient.once("error", onError);
+        testMqttClient.once("connect", onConnect);
+    });
+    await publishPromise;
 
     try {
         await mqttMonitorType.check(monitor, heartbeat, {});
     } finally {
+        try {
+            await new Promise((resolve) => {
+                testMqttClient.publish(publishTopic, "", { retain: true }, resolve);
+            });
+        } catch (error) {
+            void error;
+        }
         testMqttClient.end();
-        hiveMQContainer.stop();
+        await hiveMQContainer.stop();
     }
     return heartbeat;
 }
@@ -66,7 +141,7 @@ async function testMqtt(
 describe(
     "MqttMonitorType",
     {
-        concurrency: 4,
+        concurrency: 1,
         skip: !!process.env.CI && (process.platform !== "linux" || process.arch !== "x64"),
     },
     () => {
