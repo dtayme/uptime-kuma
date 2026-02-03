@@ -311,6 +311,7 @@ export default {
                     try {
                         return new URL(monitor.url);
                     } catch (_) {
+                        void _;
                         return null;
                     }
                 };

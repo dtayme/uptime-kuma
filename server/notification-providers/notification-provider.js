@@ -134,6 +134,7 @@ class NotificationProvider {
                 try {
                     msg += " " + JSON.stringify(error.response.data);
                 } catch (e) {
+                    void e;
                     msg += " " + String(error.response.data);
                 }
             }

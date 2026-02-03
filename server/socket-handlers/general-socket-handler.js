@@ -124,7 +124,9 @@ module.exports.generalSocketHandler = (socket, server) => {
                     return;
                 }
             }
-        } catch (e) {}
+        } catch (e) {
+            void e;
+        }
 
         callback({
             ok: false,

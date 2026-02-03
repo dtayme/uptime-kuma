@@ -86,6 +86,7 @@ export default {
                 navigator.clipboard.writeText(GOOGLE_APPS_SCRIPT_CODE);
                 alert(this.$t("Copied to clipboard!"));
             } catch (error) {
+                void error;
                 alert(this.$t("Failed to copy to clipboard"));
             }
         },

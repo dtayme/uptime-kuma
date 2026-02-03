@@ -46,6 +46,7 @@ class Nostr extends NotificationProvider {
                 await relay.publish(events[0]);
                 eventIndex = 1;
             } catch (error) {
+                void error;
                 if (relay.challenge) {
                     await relay.auth(async (evt) => {
                         return finalizeEvent(evt, senderPrivateKey);

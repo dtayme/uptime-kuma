@@ -603,6 +603,7 @@ class StatusPage extends BeanModel {
 
             return publicMaintenanceList;
         } catch (error) {
+            void error;
             return [];
         }
     }

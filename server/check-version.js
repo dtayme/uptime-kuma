@@ -41,6 +41,7 @@ exports.startInterval = () => {
                 exports.latestVersion = res.data.slow;
             }
         } catch (_) {
+            void _;
             log.info("update-checker", "Failed to check for new versions");
         }
     };

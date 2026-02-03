@@ -59,6 +59,7 @@ class Settings {
 
             return v;
         } catch (e) {
+            void e;
             return value;
         }
     }
@@ -97,6 +98,7 @@ class Settings {
             try {
                 result[row.key] = JSON.parse(row.value);
             } catch (e) {
+                void e;
                 result[row.key] = row.value;
             }
         }

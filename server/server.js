@@ -338,6 +338,7 @@ let needSetup = false;
             try {
                 fs.cpSync(Database.sqlitePath, `${Database.sqlitePath}.e2e-snapshot`);
             } catch (err) {
+                void err;
                 throw new Error("Unable to copy SQLite DB.");
             }
             await Database.connect();
@@ -354,6 +355,7 @@ let needSetup = false;
             try {
                 fs.cpSync(`${Database.sqlitePath}.e2e-snapshot`, Database.sqlitePath);
             } catch (err) {
+                void err;
                 throw new Error("Unable to copy snapshot file.");
             }
             await Database.connect();
@@ -1643,6 +1645,7 @@ let needSetup = false;
                 checkLogin(socket);
                 callback(await Notification.checkApprise());
             } catch (e) {
+                void e;
                 callback(false);
             }
         });

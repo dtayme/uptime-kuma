@@ -44,6 +44,7 @@ export default {
                 this.$router.push("/dashboard");
             }
         } catch (e) {
+            void e;
             alert("Cannot connect to the backend server. Did you start the backend server? (npm run start-server-dev)");
         }
     },

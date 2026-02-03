@@ -83,6 +83,7 @@ class RadiusClient {
                     try {
                         socket.close();
                     } catch (err) {
+                        void err;
                         // Ignore errors during cleanup
                     }
                 }

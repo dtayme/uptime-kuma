@@ -223,6 +223,7 @@ export default {
                 event.dataTransfer.setData("text/monitor-id", String(this.monitor.id));
                 event.dataTransfer.effectAllowed = "move";
             } catch (e) {
+                void e;
                 // ignore
             }
         },
@@ -292,6 +293,7 @@ export default {
                     }
                 });
             } catch (e) {
+                void e;
                 // revert on exception
                 if (this.$root.monitorList[draggedMonitorId]) {
                     this.$root.monitorList[draggedMonitorId].parent = originalParent;

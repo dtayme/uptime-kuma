@@ -102,6 +102,7 @@ class UptimeKumaServer {
         try {
             this.indexHTML = fs.readFileSync("./dist/index.html").toString();
         } catch (e) {
+            void e;
             // "dist/index.html" is not necessary for development
             if (process.env.NODE_ENV !== "development") {
                 log.error("server", "Error: Cannot find 'dist/index.html', did you install correctly?");
@@ -184,6 +185,7 @@ class UptimeKumaServer {
                                 callback(null, true);
                             }
                         } catch (e) {
+                            void e;
                             // Invalid origin url, probably not from browser
                             callback(null, false);
                             log.error("auth", `Invalid origin url (${origin}), IP: ${clientIP}`);
@@ -434,6 +436,7 @@ class UptimeKumaServer {
                 return "UTC";
             }
         } catch (e) {
+            void e;
             // Guess failed, fall back to UTC
             log.debug("timezone", "Guessed an invalid timezone. Use UTC as fallback");
             return "UTC";
@@ -458,6 +461,7 @@ class UptimeKumaServer {
         try {
             dayjs.utc("2013-11-18 11:55").tz(timezone).format();
         } catch (e) {
+            void e;
             throw new Error("Invalid timezone:" + timezone);
         }
     }
@@ -509,6 +513,7 @@ class UptimeKumaServer {
                 log.info("services", "Starting nscd");
                 await childProcessAsync.exec("sudo service nscd start");
             } catch (e) {
+                void e;
                 log.info("services", "Failed to start nscd");
             }
         }
@@ -524,6 +529,7 @@ class UptimeKumaServer {
                 log.info("services", "Stopping nscd");
                 await childProcessAsync.exec("sudo service nscd stop");
             } catch (e) {
+                void e;
                 log.info("services", "Failed to stop nscd");
             }
         }
@@ -550,7 +556,9 @@ class UptimeKumaServer {
                 try {
                     socket.emit("refresh");
                     socket.disconnect();
-                } catch (e) {}
+                } catch (e) {
+                    void e;
+                }
             }
         }
     }

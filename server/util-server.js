@@ -164,6 +164,7 @@ exports.pingAsync = function (
             destAddr = destAddr.slice(1, -1);
         }
     } catch (e) {
+        void e;
         // ignore
     }
 
@@ -530,6 +531,7 @@ exports.checkCertificateHostname = function (certBuffer, hostname) {
     try {
         X509Certificate = require("node:crypto").X509Certificate;
     } catch (_) {
+        void _;
         // X509Certificate is not available in this version of Node.js
         return true;
     }
@@ -686,6 +688,7 @@ exports.percentageToColor = (percentage, maxHue = 90, minHue = 10) => {
     try {
         return chroma(`hsl(${hue}, 90%, 40%)`).hex();
     } catch (err) {
+        void err;
         return badgeConstants.naColor;
     }
 };
@@ -868,6 +871,7 @@ module.exports.axiosAbortSignal = (timeoutMs) => {
         }
         return AbortSignal.timeout(timeoutMs);
     } catch (_) {
+        void _;
         // v16-: AbortSignal.timeout is not supported
         try {
             const abortController = new AbortController();
@@ -875,6 +879,7 @@ module.exports.axiosAbortSignal = (timeoutMs) => {
 
             return abortController.signal;
         } catch (_) {
+            void _;
             // v15-: AbortController is not supported
             return null;
         }
@@ -981,6 +986,7 @@ async function commandExists(command) {
         await require("command-exists")(command);
         return true;
     } catch (e) {
+        void e;
         return false;
     }
 }

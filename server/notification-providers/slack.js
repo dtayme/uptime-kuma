@@ -61,6 +61,7 @@ class Slack extends NotificationProvider {
                     url: new URL(address),
                 });
             } catch (e) {
+                void e;
                 log.debug("slack", `Failed to parse address ${address} as URL`);
             }
         }

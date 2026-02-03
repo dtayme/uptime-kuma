@@ -241,6 +241,7 @@ export default {
                 try {
                     period = parseInt(newPeriod);
                 } catch (e) {
+                    void e;
                     // Invalid period
                     period = 24;
                 }

@@ -76,6 +76,7 @@ class Heartbeat extends BeanModel {
             // Offload brotli decode from main event loop to libuv thread pool
             return (await brotliDecompress(Buffer.from(response, "base64"))).toString("utf8");
         } catch (error) {
+            void error;
             return response;
         }
     }

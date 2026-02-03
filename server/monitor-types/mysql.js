@@ -83,6 +83,7 @@ class MysqlMonitorType extends MonitorType {
                 try {
                     connection.end();
                 } catch (_) {
+                    void _;
                     connection.destroy();
                 }
 
@@ -122,6 +123,7 @@ class MysqlMonitorType extends MonitorType {
                 try {
                     connection.end();
                 } catch (_) {
+                    void _;
                     connection.destroy();
                 }
 

@@ -125,12 +125,14 @@ class GlobalpingClient {
             try {
                 data = await response.json();
             } catch (error) {
+                void error;
                 data = null;
             }
         } else {
             try {
                 data = await response.text();
             } catch (error) {
+                void error;
                 data = null;
             }
         }
@@ -488,7 +490,9 @@ class GlobalpingMonitorType extends MonitorType {
                         [monitor.id]
                     );
                 }
-            } catch (e) {}
+            } catch (e) {
+                void e;
+            }
         }
 
         const validTo = new Date(tlsInfo.expiresAt);

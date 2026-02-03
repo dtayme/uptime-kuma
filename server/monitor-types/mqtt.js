@@ -106,6 +106,7 @@ class MqttMonitorType extends MonitorType {
                 const expression = jsonata(monitor.jsonPath);
                 jsonValue = await expression.evaluate(parsedMessage);
             } catch (e) {
+                void e;
                 // JSON parsing failed, jsonValue remains null
             }
         }
@@ -178,6 +179,7 @@ class MqttMonitorType extends MonitorType {
                         log.debug(this.name, "MQTT subscribed to topic");
                     });
                 } catch (e) {
+                    void e;
                     client.end();
                     clearTimeout(timeoutID);
                     reject(new Error("Cannot subscribe topic"));

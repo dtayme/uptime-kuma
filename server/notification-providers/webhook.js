@@ -51,6 +51,7 @@ class Webhook extends NotificationProvider {
                         ...JSON.parse(notification.webhookAdditionalHeaders),
                     };
                 } catch (err) {
+                    void err;
                     throw new Error("Additional Headers is not a valid JSON");
                 }
             }

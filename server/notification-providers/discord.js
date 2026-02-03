@@ -30,6 +30,7 @@ class Discord extends NotificationProvider {
                 const webhookInfo = await axios.get(webhookUrl.toString(), config);
                 webhookHasAvatar = !!webhookInfo.data.avatar;
             } catch (e) {
+                void e;
                 // If we can't verify, we assume he has an avatar to avoid forcing the default avatar
                 webhookHasAvatar = true;
             }

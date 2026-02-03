@@ -11,6 +11,7 @@ exports.up = async function (knex) {
                 lineNotifyIDs.push(id);
             }
         } catch (error) {
+            void error;
             // Ignore invalid JSON blobs here; they are handled elsewhere in the app.
         }
     }

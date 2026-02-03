@@ -14,6 +14,7 @@ class RabbitMqMonitorType extends MonitorType {
         try {
             baseUrls = JSON.parse(monitor.rabbitmqNodes);
         } catch (error) {
+            void error;
             throw new Error("Invalid RabbitMQ Nodes");
         }
 

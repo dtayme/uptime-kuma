@@ -117,11 +117,13 @@ describe("Database Migration", () => {
                 try {
                     await R.knex.destroy();
                 } catch (e) {
+                    void e;
                     // Ignore cleanup errors
                 }
                 try {
                     await mariadbContainer.stop();
                 } catch (e) {
+                    void e;
                     // Ignore cleanup errors
                 }
             }
@@ -176,11 +178,13 @@ describe("Database Migration", () => {
                 try {
                     await R.knex.destroy();
                 } catch (e) {
+                    void e;
                     // Ignore cleanup errors
                 }
                 try {
                     await mysqlContainer.stop();
                 } catch (e) {
+                    void e;
                     // Ignore cleanup errors
                 }
             }

@@ -499,6 +499,7 @@ export default {
                         });
                     });
                 } catch (error) {
+                    void error;
                     // Error already counted
                 }
             }

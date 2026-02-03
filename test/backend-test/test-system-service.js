@@ -23,6 +23,7 @@ function shouldSkip() {
         const pid1Comm = execSync("ps -p 1 -o comm=", { encoding: "utf-8" }).trim();
         return !["systemd", "init"].includes(pid1Comm);
     } catch (e) {
+        void e;
         return true;
     }
 }

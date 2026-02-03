@@ -25,6 +25,7 @@ const clearOldData = async () => {
     try {
         parsedPeriod = parseInt(period);
     } catch (_) {
+        void _;
         log.warn("clearOldData", "Failed to parse setting, resetting to default..");
         await Settings.set("keepDataPeriodDays", DEFAULT_KEEP_PERIOD, "general");
         parsedPeriod = DEFAULT_KEEP_PERIOD;

@@ -275,7 +275,9 @@ class Maintenance extends BeanModel {
                     let startAt = undefined;
                     try {
                         startAt = startDateTime.toISOString();
-                    } catch (_) {}
+                    } catch (_) {
+                        void _;
+                    }
 
                     this.beanMeta.job = new Cron(
                         this.cron,

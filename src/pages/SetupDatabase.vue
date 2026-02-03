@@ -251,6 +251,7 @@ export default {
                     throw new Error("not ready");
                 }
             } catch (e) {
+                void e;
                 console.log("Not ready yet");
                 await sleep(2000);
                 await this.goToMainServerWhenReady();

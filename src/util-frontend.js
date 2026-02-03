@@ -41,6 +41,7 @@ export function timezoneList() {
                 time: getTimezoneOffset(timezone.name),
             });
         } catch (e) {
+            void e;
             // Skipping not supported timezone.name by dayjs
         }
     }

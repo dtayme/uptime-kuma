@@ -2928,6 +2928,7 @@ export default {
                         const url = new URL(this.monitor.url);
                         return url.hostname;
                     } catch (e) {
+                        void e;
                         return this.monitor.url.replace(/https?:\/\//, "");
                     }
                 }
@@ -3664,6 +3665,7 @@ message HealthCheckResponse {
                         return false;
                     }
                 } catch (err) {
+                    void err;
                     toast.error(this.$t("invalidURL"));
                     return false;
                 }
