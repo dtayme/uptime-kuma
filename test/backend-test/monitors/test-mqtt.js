@@ -9,6 +9,9 @@ const MQTT_READY_TIMEOUT_MS = 60000;
 const MQTT_READY_RETRY_DELAY_MS = 1000;
 const MQTT_READY_CONNECT_TIMEOUT_MS = 5000;
 
+/**
+ *
+ */
 async function waitForMqttReady(connectionString) {
     const deadline = Date.now() + MQTT_READY_TIMEOUT_MS;
     let lastError = null;
