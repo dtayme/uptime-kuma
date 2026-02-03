@@ -23,21 +23,33 @@ const IpVersion = {
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 class GlobalpingClient {
+    /**
+     *
+     */
     constructor({ auth, agent, userAgent, timeout } = {}) {
         this.auth = auth;
         this.userAgent = userAgent ?? agent ?? "uptime-kuma";
         this.timeout = timeout ?? GLOBALPING_REQUEST_TIMEOUT_MS;
     }
 
+    /**
+     *
+     */
     async createMeasurement(measurement) {
         return this.request("POST", "/v1/measurements", { body: measurement });
     }
 
+    /**
+     *
+     */
     async getMeasurement(id, etag) {
         const headers = etag ? { "If-None-Match": etag } : undefined;
         return this.request("GET", `/v1/measurements/${id}`, { headers });
     }
 
+    /**
+     *
+     */
     async awaitMeasurement(id) {
         const start = Date.now();
         let result = await this.getMeasurement(id);
@@ -67,6 +79,9 @@ class GlobalpingClient {
         return result;
     }
 
+    /**
+     *
+     */
     async request(method, path, { body, headers } = {}) {
         const url = new URL(path, GLOBALPING_API_BASE);
         const requestHeaders = new Headers(headers || {});
@@ -137,6 +152,9 @@ class GlobalpingClient {
         return { ok: false, data: errorData, response };
     }
 
+    /**
+     *
+     */
     static isHttpStatus(status, result) {
         return result?.response?.status === status;
     }
