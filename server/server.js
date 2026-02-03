@@ -160,7 +160,8 @@ const testMode = !!args["test"] || false;
 let prometheusApiMetricsInitialized = false;
 
 /**
- *
+ * Initialize Prometheus metrics collection for the API endpoint.
+ * @returns {void}
  */
 function initPrometheusApiMetrics() {
     if (prometheusApiMetricsInitialized) {
@@ -187,7 +188,8 @@ function initPrometheusApiMetrics() {
 }
 
 /**
- *
+ * Send Prometheus metrics response for the API endpoint.
+ * @returns {Promise<void>}
  */
 async function handleMetricsRequest(_request, response) {
     try {

@@ -33,14 +33,14 @@ class GlobalpingClient {
     }
 
     /**
-     *
+     * @returns {Promise<{ ok: boolean, data: any, response: Response }>} The API response wrapper.
      */
     async createMeasurement(measurement) {
         return this.request("POST", "/v1/measurements", { body: measurement });
     }
 
     /**
-     *
+     * @returns {Promise<{ ok: boolean, data: any, response: Response }>} The API response wrapper.
      */
     async getMeasurement(id, etag) {
         const headers = etag ? { "If-None-Match": etag } : undefined;
@@ -48,7 +48,7 @@ class GlobalpingClient {
     }
 
     /**
-     *
+     * @returns {Promise<{ ok: boolean, data: any, response: Response }>} The API response wrapper.
      */
     async awaitMeasurement(id) {
         const start = Date.now();
@@ -80,7 +80,7 @@ class GlobalpingClient {
     }
 
     /**
-     *
+     * @returns {Promise<{ ok: boolean, data: any, response: Response }>} The API response wrapper.
      */
     async request(method, path, { body, headers } = {}) {
         const url = new URL(path, GLOBALPING_API_BASE);
@@ -153,7 +153,7 @@ class GlobalpingClient {
     }
 
     /**
-     *
+     * @returns {boolean} True when the response status matches the expected code.
      */
     static isHttpStatus(status, result) {
         return result?.response?.status === status;
