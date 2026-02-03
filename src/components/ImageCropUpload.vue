@@ -5,19 +5,11 @@
             <div class="image-crop-dialog">
                 <div class="image-crop-header">
                     <span>Logo</span>
-                    <button class="image-crop-close" type="button" @click="close">
-                        &times;
-                    </button>
+                    <button class="image-crop-close" type="button" @click="close">&times;</button>
                 </div>
 
                 <div class="image-crop-body">
-                    <input
-                        ref="fileInput"
-                        class="form-control"
-                        type="file"
-                        accept="image/*"
-                        @change="onFileChange"
-                    />
+                    <input ref="fileInput" class="form-control" type="file" accept="image/*" @change="onFileChange" />
 
                     <div v-if="imageSrc" class="image-crop-preview">
                         <div
@@ -58,12 +50,7 @@
                     <button type="button" class="btn btn-normal me-2" @click="close">
                         {{ $t("Cancel") }}
                     </button>
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        :disabled="!imageSrc"
-                        @click="applyCrop"
-                    >
+                    <button type="button" class="btn btn-primary" :disabled="!imageSrc" @click="applyCrop">
                         {{ $t("Save") }}
                     </button>
                 </div>
