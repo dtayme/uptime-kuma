@@ -1,18 +1,20 @@
 BEGIN TRANSACTION;
 
-PRAGMA writable_schema = TRUE;
+PRAGMA foreign_keys = OFF;
 
-UPDATE
-	SQLITE_MASTER
-SET
-	sql = replace(sql,
-	'monitor_id INTEGER NOT NULL',
-	'monitor_id INTEGER NOT NULL REFERENCES [monitor] ([id]) ON DELETE CASCADE ON UPDATE CASCADE'
-)
-WHERE
-	name = 'monitor_tls_info'
-	AND type = 'table';
+ALTER TABLE monitor_tls_info RENAME TO monitor_tls_info_old;
 
-PRAGMA writable_schema = RESET;
+CREATE TABLE monitor_tls_info (
+	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	monitor_id INTEGER NOT NULL REFERENCES [monitor] ([id]) ON DELETE CASCADE ON UPDATE CASCADE,
+	info_json TEXT
+);
+
+INSERT INTO monitor_tls_info (id, monitor_id, info_json)
+SELECT id, monitor_id, info_json FROM monitor_tls_info_old;
+
+DROP TABLE monitor_tls_info_old;
+
+PRAGMA foreign_keys = ON;
 
 COMMIT;
