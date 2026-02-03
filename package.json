@@ -4,7 +4,7 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/louislam/uptime-kuma.git"
+        "url": "https://github.com/dtayme/uptime-kuma.git"
     },
     "engines": {
         "node": ">= 20.4.0"
@@ -37,8 +37,8 @@
         "playwright-show-report": "playwright show-report ./private/playwright-report",
         "tsc": "tsc --project ./tsconfig-backend.json",
         "vite-preview-dist": "vite preview --host --config ./config/vite.config.js",
-        "build-docker-base": "docker buildx build -f docker/debian-base.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t louislam/uptime-kuma:base2 --target base2 . --push",
-        "build-docker-base-slim": "docker buildx build -f docker/debian-base.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t louislam/uptime-kuma:base2-slim --target base2-slim . --push",
+        "build-docker-base": "docker buildx build -f docker/debian-base.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t fognetx/uptimekuma:base2 --target base2 . --push",
+        "build-docker-base-slim": "docker buildx build -f docker/debian-base.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t fognetx/uptimekuma:base2-slim --target base2-slim . --push",
         "build-docker-builder-go": "docker buildx build -f docker/builder-go.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t louislam/uptime-kuma:builder-go . --push",
         "build-docker-nightly-local": "npm run build && docker build -f docker/dockerfile -t louislam/uptime-kuma:nightly2 --target nightly .",
         "build-docker-pr-test": "docker buildx build -f docker/dockerfile --platform linux/amd64,linux/arm64 -t louislam/uptime-kuma:pr-test2 --target pr-test2 . --push",
