@@ -228,6 +228,8 @@
         "whatwg-url": "~12.0.1"
     },
     "overrides": {
-        "event-to-promise": "file:vendor/event-to-promise"
+        "event-to-promise": "file:vendor/event-to-promise",
+        "sourcemap-codec": "npm:@jridgewell/sourcemap-codec@1.5.5",
+        "source-map": "npm:source-map-js@1.2.1"
     }
 }
