@@ -159,6 +159,9 @@ const testMode = !!args["test"] || false;
 
 let prometheusApiMetricsInitialized = false;
 
+/**
+ *
+ */
 function initPrometheusApiMetrics() {
     if (prometheusApiMetricsInitialized) {
         return;
@@ -183,6 +186,9 @@ function initPrometheusApiMetrics() {
     prometheusApiMetricsInitialized = true;
 }
 
+/**
+ *
+ */
 async function handleMetricsRequest(_request, response) {
     try {
         response.setHeader("Content-Type", PrometheusClient.register.contentType);
