@@ -10,6 +10,39 @@ and API plumbing.
 node poller/index.js
 ```
 
+## Docker
+
+Build the poller image:
+
+```bash
+docker build -f docker/poller.dockerfile -t fognetx/uptimekuma:poller .
+```
+
+Run the poller with registration (recommended for first start):
+
+```bash
+docker run --rm \
+  -e POLLER_SERVER_URL=https://central.example.com \
+  -e POLLER_REGISTRATION_TOKEN=replace-with-registration-token \
+  -e POLLER_REGION=us-east \
+  -e POLLER_DATACENTER=dc-1 \
+  -e POLLER_CAPABILITIES_JSON='{"http":true,"icmp":true,"tcp":true,"dns":true}' \
+  -v poller-data:/app/poller-data \
+  fognetx/uptimekuma:poller
+```
+
+Run the poller with an existing token:
+
+```bash
+docker run --rm \
+  -e POLLER_SERVER_URL=https://central.example.com \
+  -e POLLER_ID=1 \
+  -e POLLER_TOKEN=replace-with-access-token \
+  -e POLLER_REGION=us-east \
+  -v poller-data:/app/poller-data \
+  fognetx/uptimekuma:poller
+```
+
 Optional environment variables:
 - `POLLER_SERVER_URL` (default: `http://localhost:3001`)
 - `POLLER_ID`
