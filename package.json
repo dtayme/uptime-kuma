@@ -71,6 +71,7 @@
         "generate-changelog": "node ./extra/generate-changelog.mjs"
     },
     "dependencies": {
+        "@aws-sdk/credential-providers": "^3.982.0",
         "@grpc/grpc-js": "~1.8.22",
         "@louislam/ping": "~0.4.4-mod.1",
         "@vvo/tzdb": "^6.125.0",
@@ -90,10 +91,11 @@
         "dayjs": "~1.11.5",
         "dev-null": "^0.1.1",
         "dotenv": "~16.0.3",
+        "event-to-promise": "file:vendor/event-to-promise",
         "express": "~4.22.1",
         "express-basic-auth": "~1.2.1",
         "express-static-gzip": "~2.1.7",
-        "event-to-promise": "file:vendor/event-to-promise",
+        "fast-xml-parser": "5.3.4",
         "feed": "^4.2.2",
         "form-data": "~4.0.0",
         "gamedig": "^5.3.2",
@@ -143,7 +145,7 @@
         "socket.io-client": "~4.8.0",
         "socks-proxy-agent": "~8.0.5",
         "sqlstring": "~2.3.3",
-        "tar": "~6.2.1",
+        "tar": "~7.5.7",
         "tcp-ping": "~0.1.1",
         "thirty-two": "~1.0.2",
         "tldts": "^7.0.19",
@@ -230,8 +232,12 @@
     },
     "overrides": {
         "event-to-promise": "file:vendor/event-to-promise",
+        "fast-xml-parser": "5.3.4",
+        "glob@~10.3.0": "10.5.0",
+        "lodash": "4.17.23",
         "sourcemap-codec": "npm:@jridgewell/sourcemap-codec@1.5.5",
         "source-map": "npm:source-map-js@1.2.1",
-        "qs": "6.14.1"
+        "qs": "6.14.1",
+        "esbuild": "0.25.0"
     }
 }
