@@ -21,7 +21,7 @@ const acceptedStatusCodeDefault = ["200-299"];
 /**
  * Normalize accepted status code config.
  * @param {string|string[]|null|undefined} value Accepted status code config
- * @returns {string[]}
+ * @returns {string[]} Normalized status code rules
  */
 function normalizeAcceptedStatuscodes(value) {
     if (!value) {
@@ -42,7 +42,7 @@ function normalizeAcceptedStatuscodes(value) {
  * Determine if a status code matches any configured rules.
  * @param {number} status HTTP status code
  * @param {Array<string|number>} acceptedStatuscodes Accepted rules
- * @returns {boolean}
+ * @returns {boolean} True when the status code is accepted
  */
 function isStatusCodeAccepted(status, acceptedStatuscodes) {
     if (!acceptedStatuscodes || acceptedStatuscodes.length === 0) {
@@ -71,7 +71,7 @@ function isStatusCodeAccepted(status, acceptedStatuscodes) {
 /**
  * Normalize database query to a safe default.
  * @param {string|null|undefined} query Query string
- * @returns {string}
+ * @returns {string} Safe query string
  */
 function normalizeDbQuery(query) {
     if (!query || (typeof query === "string" && query.trim() === "")) {
@@ -83,7 +83,8 @@ function normalizeDbQuery(query) {
 /**
  * Build conditions expression group from monitor config.
  * @param {object} config Monitor config
- * @returns {import("../server/monitor-conditions/expression").ConditionExpressionGroup|null}
+ * @returns {import("../server/monitor-conditions/expression").ConditionExpressionGroup|null} Parsed conditions group
+ * @throws {Error} When the conditions payload is invalid
  */
 function buildConditions(config) {
     if (!config?.conditions) {
@@ -98,8 +99,8 @@ function buildConditions(config) {
 
 /**
  * Check if a conditions group has child expressions.
- * @param {import("../server/monitor-conditions/expression").ConditionExpressionGroup|null} conditions
- * @returns {boolean}
+ * @param {import("../server/monitor-conditions/expression").ConditionExpressionGroup|null} conditions Conditions group
+ * @returns {boolean} True when conditions are defined
  */
 function hasConditions(conditions) {
     return Boolean(conditions && conditions.children && conditions.children.length > 0);
@@ -108,7 +109,7 @@ function hasConditions(conditions) {
 /**
  * Execute an HTTP check assignment.
  * @param {object} assignment Assignment payload
- * @returns {Promise<{status:number,msg:string,latencyMs:number,body?:any}>}
+ * @returns {Promise<{status:number,msg:string,latencyMs:number,body?:any}>} Result payload
  */
 async function checkHttp(assignment) {
     const { config } = assignment;
@@ -154,7 +155,7 @@ async function checkHttp(assignment) {
 /**
  * Execute a keyword check assignment.
  * @param {object} assignment Assignment payload
- * @returns {Promise<{status:number,msg:string,latencyMs:number}>}
+ * @returns {Promise<{status:number,msg:string,latencyMs:number}>} Result payload
  */
 async function checkKeyword(assignment) {
     const { config } = assignment;
@@ -186,7 +187,7 @@ async function checkKeyword(assignment) {
 /**
  * Execute a JSON query check assignment.
  * @param {object} assignment Assignment payload
- * @returns {Promise<{status:number,msg:string,latencyMs:number}>}
+ * @returns {Promise<{status:number,msg:string,latencyMs:number}>} Result payload
  */
 async function checkJsonQuery(assignment) {
     const { config } = assignment;
@@ -218,7 +219,7 @@ async function checkJsonQuery(assignment) {
 /**
  * Execute an ICMP ping check assignment.
  * @param {object} assignment Assignment payload
- * @returns {Promise<{status:number,msg:string,latencyMs:number}>}
+ * @returns {Promise<{status:number,msg:string,latencyMs:number}>} Result payload
  */
 async function checkPing(assignment) {
     const { config } = assignment;
@@ -248,7 +249,7 @@ async function checkPing(assignment) {
 /**
  * Execute a TCP port check assignment.
  * @param {object} assignment Assignment payload
- * @returns {Promise<{status:number,msg:string,latencyMs:number}>}
+ * @returns {Promise<{status:number,msg:string,latencyMs:number}>} Result payload
  */
 function checkTcp(assignment) {
     const { config } = assignment;
@@ -283,7 +284,7 @@ function checkTcp(assignment) {
 /**
  * Execute a DNS resolution check assignment.
  * @param {object} assignment Assignment payload
- * @returns {Promise<{status:number,msg:string,latencyMs:number}>}
+ * @returns {Promise<{status:number,msg:string,latencyMs:number}>} Result payload
  */
 async function checkDns(assignment) {
     const { config } = assignment;
@@ -344,8 +345,8 @@ async function checkDns(assignment) {
  * Connect to MQTT broker and receive a single message.
  * @param {string} hostname Broker hostname
  * @param {string} topic Topic to subscribe
- * @param {{port:number,username?:string,password?:string,websocketPath?:string,timeoutMs:number}} options
- * @returns {Promise<[string,string]>}
+ * @param {{port:number,username?:string,password?:string,websocketPath?:string,timeoutMs:number}} options Connection options
+ * @returns {Promise<[string,string]>} Message topic and payload
  */
 function mqttReceive(hostname, topic, options = {}) {
     return new Promise((resolve, reject) => {
@@ -405,7 +406,7 @@ function mqttReceive(hostname, topic, options = {}) {
 /**
  * Execute an MQTT check assignment.
  * @param {object} assignment Assignment payload
- * @returns {Promise<{status:number,msg:string,latencyMs:number}>}
+ * @returns {Promise<{status:number,msg:string,latencyMs:number}>} Result payload
  */
 async function checkMqtt(assignment) {
     const { config } = assignment;
@@ -486,7 +487,7 @@ async function checkMqtt(assignment) {
 /**
  * Execute an SNMP check assignment.
  * @param {object} assignment Assignment payload
- * @returns {Promise<{status:number,msg:string,latencyMs:number}>}
+ * @returns {Promise<{status:number,msg:string,latencyMs:number}>} Result payload
  */
 async function checkSnmp(assignment) {
     const { config } = assignment;
@@ -561,7 +562,7 @@ async function checkSnmp(assignment) {
  * @param {string} connectionString Connection string
  * @param {string} query Query string
  * @param {string|undefined} password Password override
- * @returns {Promise<string>}
+ * @returns {Promise<string>} Row count message
  */
 function mysqlQuery(connectionString, query, password) {
     return new Promise((resolve, reject) => {
@@ -601,7 +602,7 @@ function mysqlQuery(connectionString, query, password) {
  * @param {string} connectionString Connection string
  * @param {string} query Query string
  * @param {string|undefined} password Password override
- * @returns {Promise<any>}
+ * @returns {Promise<any>} Single value result
  */
 function mysqlQuerySingleValue(connectionString, query, password) {
     return new Promise((resolve, reject) => {
@@ -653,7 +654,7 @@ function mysqlQuerySingleValue(connectionString, query, password) {
 /**
  * Execute a MySQL/MariaDB check assignment.
  * @param {object} assignment Assignment payload
- * @returns {Promise<{status:number,msg:string,latencyMs:number}>}
+ * @returns {Promise<{status:number,msg:string,latencyMs:number}>} Result payload
  */
 async function checkMysql(assignment) {
     const { config } = assignment;
@@ -700,7 +701,7 @@ async function checkMysql(assignment) {
  * Run a PostgreSQL query.
  * @param {string} connectionString Connection string
  * @param {string} query Query string
- * @returns {Promise<object>}
+ * @returns {Promise<object>} Query result
  */
 async function postgresQuery(connectionString, query) {
     return new Promise((resolve, reject) => {
@@ -747,7 +748,7 @@ async function postgresQuery(connectionString, query) {
  * Run a PostgreSQL query expecting a single value.
  * @param {string} connectionString Connection string
  * @param {string} query Query string
- * @returns {Promise<any>}
+ * @returns {Promise<any>} Single value result
  */
 async function postgresQuerySingleValue(connectionString, query) {
     const result = await postgresQuery(connectionString, query);
@@ -768,7 +769,7 @@ async function postgresQuerySingleValue(connectionString, query) {
 /**
  * Execute a PostgreSQL check assignment.
  * @param {object} assignment Assignment payload
- * @returns {Promise<{status:number,msg:string,latencyMs:number}>}
+ * @returns {Promise<{status:number,msg:string,latencyMs:number}>} Result payload
  */
 async function checkPostgres(assignment) {
     const { config } = assignment;
@@ -815,7 +816,7 @@ async function checkPostgres(assignment) {
  * Run a SQL Server query and return row count info.
  * @param {string} connectionString Connection string
  * @param {string} query Query string
- * @returns {Promise<string>}
+ * @returns {Promise<string>} Row count message
  */
 async function mssqlQuery(connectionString, query) {
     let pool;
@@ -839,7 +840,7 @@ async function mssqlQuery(connectionString, query) {
  * Run a SQL Server query expecting a single value result.
  * @param {string} connectionString Connection string
  * @param {string} query Query string
- * @returns {Promise<any>}
+ * @returns {Promise<any>} Single value result
  */
 async function mssqlQuerySingleValue(connectionString, query) {
     let pool;
@@ -874,7 +875,7 @@ async function mssqlQuerySingleValue(connectionString, query) {
 /**
  * Execute a SQL Server check assignment.
  * @param {object} assignment Assignment payload
- * @returns {Promise<{status:number,msg:string,latencyMs:number}>}
+ * @returns {Promise<{status:number,msg:string,latencyMs:number}>} Result payload
  */
 async function checkMssql(assignment) {
     const { config } = assignment;
@@ -920,7 +921,7 @@ async function checkMssql(assignment) {
  * Safely parse JSON or return fallback.
  * @param {string} value JSON string
  * @param {any} fallback Fallback value
- * @returns {any}
+ * @returns {any} Parsed JSON value
  */
 function safeJsonParse(value, fallback) {
     try {
@@ -933,7 +934,7 @@ function safeJsonParse(value, fallback) {
 /**
  * Execute an assignment by type.
  * @param {object} assignment Assignment payload
- * @returns {Promise<{status:number,msg:string,latencyMs?:number,body?:any}>}
+ * @returns {Promise<{status:number,msg:string,latencyMs?:number,body?:any}>} Result payload
  */
 async function executeAssignment(assignment) {
     switch (assignment.type) {

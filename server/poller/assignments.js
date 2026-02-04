@@ -4,7 +4,7 @@ const { R } = require("redbean-node");
 /**
  * Parse poller capabilities JSON.
  * @param {string|object|null|undefined} value Capabilities payload
- * @returns {object}
+ * @returns {object} Parsed capabilities map
  */
 function parseCapabilities(value) {
     if (!value) {
@@ -21,7 +21,7 @@ function parseCapabilities(value) {
  * Check if a poller has the required capability.
  * @param {object} pollerCaps Capabilities map
  * @param {string} required Required capability key
- * @returns {boolean}
+ * @returns {boolean} True when capability is present
  */
 function pollerHasCapability(pollerCaps, required) {
     if (!required) {
@@ -33,7 +33,7 @@ function pollerHasCapability(pollerCaps, required) {
 /**
  * Compute poller selection weight based on configuration and load.
  * @param {object} poller Poller record
- * @returns {number}
+ * @returns {number} Weighted score value
  */
 function pollerWeight(poller) {
     const parsedWeight = Number.parseFloat(poller.weight);
@@ -51,7 +51,7 @@ function pollerWeight(poller) {
 /**
  * Hash a string to a [0,1] unit interval.
  * @param {string} value Input string
- * @returns {number}
+ * @returns {number} Normalized hash value
  */
 function hashToUnit(value) {
     const digest = crypto.createHash("sha1").update(value).digest();
@@ -63,7 +63,7 @@ function hashToUnit(value) {
  * Select the target poller for a monitor using weighted hashing.
  * @param {object} monitor Monitor record
  * @param {object[]} pollers Candidate pollers
- * @returns {number|null}
+ * @returns {number|null} Selected poller id
  */
 function selectPollerIdForMonitor(monitor, pollers) {
     if (!pollers.length) {
@@ -88,7 +88,7 @@ function selectPollerIdForMonitor(monitor, pollers) {
 /**
  * Compute a stable assignment version for a poller.
  * @param {object[]} assignments Assignment list
- * @returns {number}
+ * @returns {number} Deterministic version number
  */
 function computeAssignmentVersion(assignments) {
     const payload = JSON.stringify(assignments || []);
@@ -99,7 +99,7 @@ function computeAssignmentVersion(assignments) {
 /**
  * Build a monitor config payload for the poller.
  * @param {object} monitor Monitor record
- * @returns {object}
+ * @returns {object} Monitor configuration payload
  */
 function buildMonitorConfig(monitor) {
     return {
@@ -156,7 +156,7 @@ function buildMonitorConfig(monitor) {
 /**
  * Normalize poller mode value.
  * @param {string|null|undefined} mode Poller mode
- * @returns {string}
+ * @returns {string} Normalized mode value
  */
 function normalizePollerMode(mode) {
     return mode || "local";
@@ -165,7 +165,7 @@ function normalizePollerMode(mode) {
 /**
  * Build assignments list for a poller.
  * @param {object} poller Poller record
- * @returns {Promise<object[]>}
+ * @returns {Promise<object[]>} Assignment list
  */
 async function buildAssignmentsForPoller(poller) {
     const pollers = await R.find("poller");

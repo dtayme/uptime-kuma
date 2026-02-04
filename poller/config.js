@@ -4,7 +4,7 @@ const path = require("path");
  * Parse an integer-like value or return fallback.
  * @param {string|number|null|undefined} value Value to parse
  * @param {number} fallback Fallback value
- * @returns {number}
+ * @returns {number} Parsed integer value
  */
 function parseNumber(value, fallback) {
     if (value === undefined || value === null || value === "") {
@@ -19,7 +19,7 @@ function parseNumber(value, fallback) {
  * Parse JSON or return fallback.
  * @param {string|object|null|undefined} value JSON string or object
  * @param {any} fallback Fallback value
- * @returns {any}
+ * @returns {any} Parsed JSON value
  */
 function parseJson(value, fallback) {
     if (!value) {
@@ -35,7 +35,7 @@ function parseJson(value, fallback) {
 
 /**
  * Load poller configuration from environment variables.
- * @returns {object}
+ * @returns {object} Poller configuration object
  */
 function loadConfig() {
     return {

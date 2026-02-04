@@ -1,7 +1,7 @@
 /**
  * Create a scoped logger for the poller runtime.
  * @param {string} scope Log scope label
- * @returns {{info: Function, warn: Function, error: Function, debug: Function}}
+ * @returns {{info: Function, warn: Function, error: Function, debug: Function}} Logger instance
  */
 function createLogger(scope) {
     return {

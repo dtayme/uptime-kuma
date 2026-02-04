@@ -37,7 +37,7 @@ function initSchema(db) {
 /**
  * Get current queue depth.
  * @param {import("better-sqlite3").Database} db Database instance
- * @returns {number}
+ * @returns {number} Count of queued rows
  */
 function queueDepth(db) {
     const row = db.prepare("SELECT COUNT(*) AS count FROM poller_queue").get();
@@ -72,7 +72,7 @@ function enqueueResult(db, record) {
  * Dequeue a batch of pending results.
  * @param {import("better-sqlite3").Database} db Database instance
  * @param {number} limit Max batch size
- * @returns {object[]}
+ * @returns {object[]} Queue rows
  */
 function dequeueBatch(db, limit) {
     return db.prepare(`
@@ -128,7 +128,7 @@ function pruneExpired(db, retentionSeconds) {
 /**
  * Load cached assignments snapshot.
  * @param {import("better-sqlite3").Database} db Database instance
- * @returns {{assignmentVersion: number, assignments: object[]} | null}
+ * @returns {{assignmentVersion: number, assignments: object[]} | null} Cached assignments snapshot
  */
 function loadAssignments(db) {
     const row = db.prepare("SELECT assignment_version, snapshot_json FROM poller_assignments LIMIT 1").get();

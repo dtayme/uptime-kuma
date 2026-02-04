@@ -5,7 +5,7 @@ const Database = require("better-sqlite3");
 /**
  * Open (and create if needed) the poller SQLite database.
  * @param {string} dbPath Database file path
- * @returns {import("better-sqlite3").Database}
+ * @returns {import("better-sqlite3").Database} Open database instance
  */
 function openDatabase(dbPath) {
     const dir = path.dirname(dbPath);

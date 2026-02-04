@@ -22,7 +22,7 @@ const io = server.io;
 
 /**
  * Check if pollers are enabled.
- * @returns {boolean}
+ * @returns {boolean} True when pollers are enabled
  */
 function pollersEnabled() {
     return process.env.ENABLE_REMOTE_POLLERS === "1" || process.env.ENABLE_POLLERS === "1";
@@ -30,8 +30,8 @@ function pollersEnabled() {
 
 /**
  * Extract registration token from request.
- * @param {import("express").Request} request
- * @returns {string}
+ * @param {import("express").Request} request Incoming request
+ * @returns {string} Registration token
  */
 function getRegistrationToken(request) {
     return request.headers["x-poller-registration-token"] || request.body?.registration_token || "";
@@ -39,8 +39,8 @@ function getRegistrationToken(request) {
 
 /**
  * Hash a token using SHA-256.
- * @param {string} token
- * @returns {string}
+ * @param {string} token Raw token
+ * @returns {string} SHA-256 hash
  */
 function hashToken(token) {
     return crypto.createHash("sha256").update(token).digest("hex");
@@ -48,7 +48,7 @@ function hashToken(token) {
 
 /**
  * Get current UTC time in ISO format.
- * @returns {string}
+ * @returns {string} ISO timestamp
  */
 function nowIso() {
     return R.isoDateTimeMillis(dayjs.utc());
@@ -56,8 +56,8 @@ function nowIso() {
 
 /**
  * Normalize poller mode.
- * @param {string|null|undefined} mode
- * @returns {string}
+ * @param {string|null|undefined} mode Poller mode value
+ * @returns {string} Normalized mode
  */
 function normalizePollerMode(mode) {
     return mode || "local";
@@ -65,8 +65,8 @@ function normalizePollerMode(mode) {
 
 /**
  * Parse result status value into enum value.
- * @param {string|number|null|undefined} statusValue
- * @returns {number|null}
+ * @param {string|number|null|undefined} statusValue Incoming status value
+ * @returns {number|null} Parsed status enum
  */
 function parseResultStatus(statusValue) {
     if (statusValue === undefined || statusValue === null) {
@@ -261,9 +261,9 @@ async function processPollerResult(poller, result) {
 
 /**
  * Express middleware to validate poller auth.
- * @param {import("express").Request} request
- * @param {import("express").Response} response
- * @param {import("express").NextFunction} next
+ * @param {import("express").Request} request Incoming request
+ * @param {import("express").Response} response Response object
+ * @param {import("express").NextFunction} next Next middleware
  * @returns {Promise<void>}
  */
 async function requirePollerAuth(request, response, next) {

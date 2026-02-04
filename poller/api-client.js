@@ -3,7 +3,7 @@
  */
 class PollerApiClient {
     /**
-     * @param {{baseUrl: string, accessToken: string | null, pollerId: number | string | null}} options
+     * @param {{baseUrl: string, accessToken: string | null, pollerId: number | string | null}} options Client options
      */
     constructor({ baseUrl, accessToken, pollerId }) {
         this.baseUrl = baseUrl.replace(/\/+$/, "");
@@ -14,7 +14,7 @@ class PollerApiClient {
     /**
      * Send a heartbeat payload to the central server.
      * @param {object} payload Heartbeat payload
-     * @returns {Promise<object|null>}
+     * @returns {Promise<object|null>} API response payload
      */
     async heartbeat(payload) {
         return this.request("/api/poller/heartbeat", {
@@ -26,7 +26,7 @@ class PollerApiClient {
     /**
      * Fetch assignments from the central server.
      * @param {number|null} sinceVersion Last known assignment version
-     * @returns {Promise<object|null>}
+     * @returns {Promise<object|null>} Assignment response payload
      */
     async fetchAssignments(sinceVersion) {
         const url = new URL(`${this.baseUrl}/api/poller/assignments`);
@@ -43,7 +43,7 @@ class PollerApiClient {
     /**
      * Submit poller results to the central server.
      * @param {Array<object>} results Results payload
-     * @returns {Promise<object|null>}
+     * @returns {Promise<object|null>} API response payload
      */
     async postResults(results) {
         return this.request("/api/poller/results", {
@@ -56,7 +56,7 @@ class PollerApiClient {
      * Register the poller with the central server.
      * @param {object} payload Registration payload
      * @param {string} registrationToken Registration token
-     * @returns {Promise<object|null>}
+     * @returns {Promise<object|null>} Registration response payload
      */
     async registerPoller(payload, registrationToken) {
         return this.request(
@@ -77,7 +77,7 @@ class PollerApiClient {
      * @param {string} pathOrUrl Relative path or absolute URL
      * @param {object} options Fetch options
      * @param {boolean} isAbsolute Treat path as absolute URL
-     * @returns {Promise<object|null>}
+     * @returns {Promise<object|null>} Parsed JSON payload (if any)
      */
     async request(pathOrUrl, options, isAbsolute) {
         const url = isAbsolute ? pathOrUrl : `${this.baseUrl}${pathOrUrl}`;

@@ -207,7 +207,7 @@ async function uploadQueue() {
 /**
  * Calculate retry backoff delay in seconds.
  * @param {number} attempts Attempt count
- * @returns {number}
+ * @returns {number} Delay in seconds
  */
 function backoffSeconds(attempts) {
     const delays = [2, 5, 15, 30, 60, 120, 300];

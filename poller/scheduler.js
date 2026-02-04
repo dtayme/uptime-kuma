@@ -1,6 +1,6 @@
 class Scheduler {
     /**
-     * @param {{logger: {info: Function, warn: Function} | null, executeAssignment: Function, enqueueResult: Function}} options
+     * @param {{logger: {info: Function, warn: Function} | null, executeAssignment: Function, enqueueResult: Function}} options Scheduler dependencies
      */
     constructor({ logger, executeAssignment, enqueueResult }) {
         this.logger = logger;
