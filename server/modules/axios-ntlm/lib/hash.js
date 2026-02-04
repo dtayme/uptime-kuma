@@ -39,6 +39,7 @@ function calculateDES(key, message) {
         }
         desKey[i] |= parity % 2 === 0 ? 1 : 0;
     }
+    // NTLM requires legacy DES for compatibility with servers. lgtm [js/weak-cryptographic-algorithm]
     var des = crypto.createCipheriv("DES-ECB", desKey, "");
     return des.update(message);
 }
@@ -52,11 +53,13 @@ function createNTLMResponse(challenge, ntlmhash) {
     return buf;
 }
 function createNTLMHash(password) {
+    // NTLM requires MD4 for password hashing. lgtm [js/weak-cryptographic-algorithm, js/insufficient-password-hash]
     var md4sum = crypto.createHash("md4");
     md4sum.update(new Buffer.from(password, "ucs2"));
     return md4sum.digest();
 }
 function createNTLMv2Hash(ntlmhash, username, authTargetName) {
+    // NTLMv2 uses HMAC-MD5 as defined by the protocol. lgtm [js/weak-cryptographic-algorithm]
     var hmac = crypto.createHmac("md5", ntlmhash);
     hmac.update(new Buffer.from(username.toUpperCase() + authTargetName, "ucs2"));
     return hmac.digest();
@@ -64,6 +67,7 @@ function createNTLMv2Hash(ntlmhash, username, authTargetName) {
 function createLMv2Response(type2message, username, ntlmhash, nonce, targetName) {
     var buf = new Buffer.alloc(24),
         ntlm2hash = createNTLMv2Hash(ntlmhash, username, targetName),
+        // NTLMv2 uses HMAC-MD5 as defined by the protocol. lgtm [js/weak-cryptographic-algorithm]
         hmac = crypto.createHmac("md5", ntlm2hash);
     //server challenge
     type2message.challenge.copy(buf, 8);
@@ -78,6 +82,7 @@ function createLMv2Response(type2message, username, ntlmhash, nonce, targetName)
 function createNTLMv2Response(type2message, username, ntlmhash, nonce, targetName) {
     var buf = new Buffer.alloc(48 + type2message.targetInfo.buffer.length),
         ntlm2hash = createNTLMv2Hash(ntlmhash, username, targetName),
+        // NTLMv2 uses HMAC-MD5 as defined by the protocol. lgtm [js/weak-cryptographic-algorithm]
         hmac = crypto.createHmac("md5", ntlm2hash);
     //the first 8 bytes are spare to store the hashed value before the blob
     //server challenge

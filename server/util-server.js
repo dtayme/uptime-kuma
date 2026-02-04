@@ -656,6 +656,7 @@ exports.doubleCheckPassword = async (socket, currentPassword) => {
 
     let user = await R.findOne("user", " id = ? AND active = 1 ", [socket.userID]);
 
+    // Legacy SHA1 hashes are supported for backward compatibility and rehashed on login. lgtm [js/insufficient-password-hash]
     if (!user || !passwordHash.verify(currentPassword, user.password)) {
         throw new Error("Incorrect current password");
     }

@@ -23,6 +23,7 @@ func main() {
 	isK8s := strings.HasPrefix(os.Getenv("UPTIME_KUMA_PORT"), "tcp://")
 
 	// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+	// Local healthcheck may use self-signed certificates. lgtm [go/disabled-certificate-check]
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
 		InsecureSkipVerify: true,
 	}

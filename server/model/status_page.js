@@ -149,8 +149,15 @@ class StatusPage extends BeanModel {
     static async renderHTML(indexHTML, statusPage) {
         const { document } = parseHTML(indexHTML);
 
-        const description155 = marked(statusPage.description ?? "")
-            .replace(/<[^>]+>/gm, "")
+        const stripHtml = (html) => {
+            const { document: htmlDocument } = parseHTML(html);
+            if (htmlDocument.body) {
+                return htmlDocument.body.textContent || "";
+            }
+            return htmlDocument.textContent || "";
+        };
+
+        const description155 = stripHtml(marked(statusPage.description ?? ""))
             .trim()
             .substring(0, 155);
 

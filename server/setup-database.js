@@ -5,6 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const Database = require("./database");
 const { allowDevAllOrigin } = require("./util-server");
+const { setupRateLimiter } = require("./rate-limiter");
 const mysql = require("mysql2/promise");
 
 /**
@@ -170,6 +171,13 @@ class SetupDatabase {
 
                 if (this.runningSetup) {
                     response.status(400).json("Setup is already running");
+                    return;
+                }
+
+                const allowed = await setupRateLimiter.pass((err) => {
+                    response.status(429).json(err);
+                });
+                if (!allowed) {
                     return;
                 }
 

@@ -8,6 +8,7 @@
  */
 const FBSD = /^freebsd/.test(process.platform);
 
+// Local healthcheck may use self-signed certificates. lgtm [js/disabling-certificate-validation]
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 let client;
