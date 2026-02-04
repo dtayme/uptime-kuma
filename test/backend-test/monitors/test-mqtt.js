@@ -16,6 +16,9 @@ const MQTT_CONTAINER_TMPFS = {
     "/opt/hivemq/data": "rw",
 };
 
+/**
+ *
+ */
 async function startMqttContainer() {
     return new GenericContainer(MQTT_CONTAINER_IMAGE)
         .withExposedPorts(MQTT_CONTAINER_PORT)

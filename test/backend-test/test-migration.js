@@ -58,106 +58,38 @@ describe(
         concurrency: 1,
     },
     () => {
-    test("SQLite migrations run successfully from fresh database", async () => {
-        const testDbPath = path.join(__dirname, "../../data/test-migration.db");
-        const testDbDir = path.dirname(testDbPath);
+        test("SQLite migrations run successfully from fresh database", async () => {
+            const testDbPath = path.join(__dirname, "../../data/test-migration.db");
+            const testDbDir = path.dirname(testDbPath);
 
-        // Ensure data directory exists
-        if (!fs.existsSync(testDbDir)) {
-            fs.mkdirSync(testDbDir, { recursive: true });
-        }
+            // Ensure data directory exists
+            if (!fs.existsSync(testDbDir)) {
+                fs.mkdirSync(testDbDir, { recursive: true });
+            }
 
-        // Clean up any existing test database
-        if (fs.existsSync(testDbPath)) {
-            fs.unlinkSync(testDbPath);
-        }
-
-        // Use the same SQLite driver as the project
-        const Dialect = require("knex/lib/dialects/better-sqlite3/index.js");
-
-        const knex = require("knex");
-        const db = knex({
-            client: Dialect,
-            connection: {
-                filename: testDbPath,
-            },
-            useNullAsDefault: true,
-        });
-
-        // Setup R (redbean) with knex instance like production code does
-        const { R } = require("redbean-node");
-        R.setup(db);
-
-        try {
-            // Use production code to initialize SQLite tables (like first run)
-            const { createTables } = require("../../db/knex_init_db.js");
-            await createTables();
-
-            // Run all migrations like production code does
-            await R.knex.migrate.latest({
-                directory: path.join(__dirname, "../../db/knex_migrations"),
-            });
-
-            // Test passes if migrations complete successfully without errors
-        } finally {
-            // Clean up
-            await R.knex.destroy();
+            // Clean up any existing test database
             if (fs.existsSync(testDbPath)) {
                 fs.unlinkSync(testDbPath);
             }
-        }
-    });
 
-    test(
-        "MariaDB migrations run successfully from fresh database",
-        {
-            skip: !!process.env.CI && (process.platform !== "linux" || process.arch !== "x64"),
-        },
-        async () => {
-            // Start MariaDB container (using MariaDB 12 to match current production)
-            const mariadbDatabase = "kuma_test";
-            const mariadbUser = "kuma";
-            const mariadbPassword = "kuma";
-            const mariadbContainer = await new GenericContainer("mariadb:12")
-                .withEnvironment({
-                    MYSQL_ROOT_PASSWORD: "root",
-                    MYSQL_DATABASE: mariadbDatabase,
-                    MYSQL_USER: mariadbUser,
-                    MYSQL_PASSWORD: mariadbPassword,
-                })
-                .withExposedPorts(3306)
-                .withWaitStrategy(Wait.forLogMessage(/port: 3306/i))
-                .withStartupTimeout(120000)
-                .start();
-
-            const mariadbConnectionString = `mysql://${mariadbUser}:${mariadbPassword}@${mariadbContainer.getHost()}:${mariadbContainer.getMappedPort(3306)}/${mariadbDatabase}`;
-            await waitForMysqlReady(mariadbConnectionString);
+            // Use the same SQLite driver as the project
+            const Dialect = require("knex/lib/dialects/better-sqlite3/index.js");
 
             const knex = require("knex");
-            const knexInstance = knex({
-                client: "mysql2",
+            const db = knex({
+                client: Dialect,
                 connection: {
-                    host: mariadbContainer.getHost(),
-                    port: mariadbContainer.getMappedPort(3306),
-                    user: mariadbUser,
-                    password: mariadbPassword,
-                    database: mariadbDatabase,
-                    connectTimeout: 60000,
+                    filename: testDbPath,
                 },
-                pool: {
-                    min: 0,
-                    max: 10,
-                    acquireTimeoutMillis: 60000,
-                    idleTimeoutMillis: 60000,
-                },
+                useNullAsDefault: true,
             });
 
             // Setup R (redbean) with knex instance like production code does
             const { R } = require("redbean-node");
-            R.setup(knexInstance);
+            R.setup(db);
 
             try {
-                // Use production code to initialize MariaDB tables
+                // Use production code to initialize SQLite tables (like first run)
                 const { createTables } = require("../../db/knex_init_db.js");
                 await createTables();
 
@@ -169,97 +101,165 @@ describe(
                 // Test passes if migrations complete successfully without errors
             } finally {
                 // Clean up
-                try {
-                    await R.knex.destroy();
-                } catch (e) {
-                    void e;
-                    // Ignore cleanup errors
-                }
-                try {
-                    await mariadbContainer.stop();
-                } catch (e) {
-                    void e;
-                    // Ignore cleanup errors
+                await R.knex.destroy();
+                if (fs.existsSync(testDbPath)) {
+                    fs.unlinkSync(testDbPath);
                 }
             }
-        }
-    );
+        });
 
-    test(
-        "MySQL migrations run successfully from fresh database",
-        {
-            skip: !!process.env.CI && (process.platform !== "linux" || process.arch !== "x64"),
-        },
-        async () => {
-            // Start MySQL 8.0 container (the version mentioned in the issue)
-            const mysqlDatabase = "kuma_test";
-            const mysqlUser = "kuma";
-            const mysqlPassword = "kuma";
-            const mysqlContainer = await new GenericContainer("mysql:8.0")
-                .withEnvironment({
-                    MYSQL_ROOT_PASSWORD: "root",
-                    MYSQL_DATABASE: mysqlDatabase,
-                    MYSQL_USER: mysqlUser,
-                    MYSQL_PASSWORD: mysqlPassword,
-                })
-                .withExposedPorts(3306)
-                .withWaitStrategy(Wait.forLogMessage(/port: 3306/i))
-                .withStartupTimeout(120000)
-                .start();
+        test(
+            "MariaDB migrations run successfully from fresh database",
+            {
+                skip: !!process.env.CI && (process.platform !== "linux" || process.arch !== "x64"),
+            },
+            async () => {
+                // Start MariaDB container (using MariaDB 12 to match current production)
+                const mariadbDatabase = "kuma_test";
+                const mariadbUser = "kuma";
+                const mariadbPassword = "kuma";
+                const mariadbContainer = await new GenericContainer("mariadb:12")
+                    .withEnvironment({
+                        MYSQL_ROOT_PASSWORD: "root",
+                        MYSQL_DATABASE: mariadbDatabase,
+                        MYSQL_USER: mariadbUser,
+                        MYSQL_PASSWORD: mariadbPassword,
+                    })
+                    .withExposedPorts(3306)
+                    .withWaitStrategy(Wait.forLogMessage(/port: 3306/i))
+                    .withStartupTimeout(120000)
+                    .start();
 
-            const mysqlConnectionString = `mysql://${mysqlUser}:${mysqlPassword}@${mysqlContainer.getHost()}:${mysqlContainer.getMappedPort(3306)}/${mysqlDatabase}`;
-            await waitForMysqlReady(mysqlConnectionString);
+                const mariadbConnectionString = `mysql://${mariadbUser}:${mariadbPassword}@${mariadbContainer.getHost()}:${mariadbContainer.getMappedPort(3306)}/${mariadbDatabase}`;
+                await waitForMysqlReady(mariadbConnectionString);
 
-            const knex = require("knex");
-            const knexInstance = knex({
-                client: "mysql2",
-                connection: {
-                    host: mysqlContainer.getHost(),
-                    port: mysqlContainer.getMappedPort(3306),
-                    user: mysqlUser,
-                    password: mysqlPassword,
-                    database: mysqlDatabase,
-                    connectTimeout: 60000,
-                },
-                pool: {
-                    min: 0,
-                    max: 10,
-                    acquireTimeoutMillis: 60000,
-                    idleTimeoutMillis: 60000,
-                },
-            });
-
-            // Setup R (redbean) with knex instance like production code does
-            const { R } = require("redbean-node");
-            R.setup(knexInstance);
-
-            try {
-                // Use production code to initialize MySQL tables
-                const { createTables } = require("../../db/knex_init_db.js");
-                await createTables();
-
-                // Run all migrations like production code does
-                await R.knex.migrate.latest({
-                    directory: path.join(__dirname, "../../db/knex_migrations"),
+                const knex = require("knex");
+                const knexInstance = knex({
+                    client: "mysql2",
+                    connection: {
+                        host: mariadbContainer.getHost(),
+                        port: mariadbContainer.getMappedPort(3306),
+                        user: mariadbUser,
+                        password: mariadbPassword,
+                        database: mariadbDatabase,
+                        connectTimeout: 60000,
+                    },
+                    pool: {
+                        min: 0,
+                        max: 10,
+                        acquireTimeoutMillis: 60000,
+                        idleTimeoutMillis: 60000,
+                    },
                 });
 
-                // Test passes if migrations complete successfully without errors
-            } finally {
-                // Clean up
+                // Setup R (redbean) with knex instance like production code does
+                const { R } = require("redbean-node");
+                R.setup(knexInstance);
+
                 try {
-                    await R.knex.destroy();
-                } catch (e) {
-                    void e;
-                    // Ignore cleanup errors
-                }
-                try {
-                    await mysqlContainer.stop();
-                } catch (e) {
-                    void e;
-                    // Ignore cleanup errors
+                    // Use production code to initialize MariaDB tables
+                    const { createTables } = require("../../db/knex_init_db.js");
+                    await createTables();
+
+                    // Run all migrations like production code does
+                    await R.knex.migrate.latest({
+                        directory: path.join(__dirname, "../../db/knex_migrations"),
+                    });
+
+                    // Test passes if migrations complete successfully without errors
+                } finally {
+                    // Clean up
+                    try {
+                        await R.knex.destroy();
+                    } catch (e) {
+                        void e;
+                        // Ignore cleanup errors
+                    }
+                    try {
+                        await mariadbContainer.stop();
+                    } catch (e) {
+                        void e;
+                        // Ignore cleanup errors
+                    }
                 }
             }
-        }
-    );
+        );
+
+        test(
+            "MySQL migrations run successfully from fresh database",
+            {
+                skip: !!process.env.CI && (process.platform !== "linux" || process.arch !== "x64"),
+            },
+            async () => {
+                // Start MySQL 8.0 container (the version mentioned in the issue)
+                const mysqlDatabase = "kuma_test";
+                const mysqlUser = "kuma";
+                const mysqlPassword = "kuma";
+                const mysqlContainer = await new GenericContainer("mysql:8.0")
+                    .withEnvironment({
+                        MYSQL_ROOT_PASSWORD: "root",
+                        MYSQL_DATABASE: mysqlDatabase,
+                        MYSQL_USER: mysqlUser,
+                        MYSQL_PASSWORD: mysqlPassword,
+                    })
+                    .withExposedPorts(3306)
+                    .withWaitStrategy(Wait.forLogMessage(/port: 3306/i))
+                    .withStartupTimeout(120000)
+                    .start();
+
+                const mysqlConnectionString = `mysql://${mysqlUser}:${mysqlPassword}@${mysqlContainer.getHost()}:${mysqlContainer.getMappedPort(3306)}/${mysqlDatabase}`;
+                await waitForMysqlReady(mysqlConnectionString);
+
+                const knex = require("knex");
+                const knexInstance = knex({
+                    client: "mysql2",
+                    connection: {
+                        host: mysqlContainer.getHost(),
+                        port: mysqlContainer.getMappedPort(3306),
+                        user: mysqlUser,
+                        password: mysqlPassword,
+                        database: mysqlDatabase,
+                        connectTimeout: 60000,
+                    },
+                    pool: {
+                        min: 0,
+                        max: 10,
+                        acquireTimeoutMillis: 60000,
+                        idleTimeoutMillis: 60000,
+                    },
+                });
+
+                // Setup R (redbean) with knex instance like production code does
+                const { R } = require("redbean-node");
+                R.setup(knexInstance);
+
+                try {
+                    // Use production code to initialize MySQL tables
+                    const { createTables } = require("../../db/knex_init_db.js");
+                    await createTables();
+
+                    // Run all migrations like production code does
+                    await R.knex.migrate.latest({
+                        directory: path.join(__dirname, "../../db/knex_migrations"),
+                    });
+
+                    // Test passes if migrations complete successfully without errors
+                } finally {
+                    // Clean up
+                    try {
+                        await R.knex.destroy();
+                    } catch (e) {
+                        void e;
+                        // Ignore cleanup errors
+                    }
+                    try {
+                        await mysqlContainer.stop();
+                    } catch (e) {
+                        void e;
+                        // Ignore cleanup errors
+                    }
+                }
+            }
+        );
     }
 );
