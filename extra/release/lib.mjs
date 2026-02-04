@@ -3,7 +3,7 @@ import * as childProcess from "child_process";
 import semver from "semver";
 import { generateChangelog } from "../generate-changelog.mjs";
 import fs from "fs";
-import tar from "tar";
+import * as tar from "tar";
 
 export const dryRun = process.env.RELEASE_DRY_RUN === "1";
 
