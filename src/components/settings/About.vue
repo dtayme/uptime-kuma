@@ -2,7 +2,7 @@
     <div class="d-flex justify-content-center align-items-center">
         <div class="logo d-flex flex-column justify-content-center align-items-center">
             <object class="my-4" width="200" height="200" data="/icon.svg" />
-            <div class="fs-4 fw-bold">Uptime Kuma</div>
+            <div class="fs-4 fw-bold">{{ appName }}</div>
             <div>{{ $t("versionIs", { version: $root.info.version }) }}</div>
             <div class="frontend-version">{{ $t("frontendVersionIs", { version: $root.frontendVersion }) }}</div>
 
@@ -11,9 +11,13 @@
             </div>
 
             <div class="my-3 update-link">
-                <a href="https://github.com/louislam/uptime-kuma/releases" target="_blank" rel="noopener">
+                <a href="https://github.com/dtayme/uptime-kuma/releases" target="_blank" rel="noopener">
                     {{ $t("Check Update On GitHub") }}
                 </a>
+            </div>
+
+            <div class="mt-2 text-muted">
+                Forked from Uptime Kuma by Louis Lam.
             </div>
 
             <div class="mt-1">
@@ -47,8 +51,13 @@
 </template>
 
 <script>
+import { appName } from "../../util";
+
 export default {
     computed: {
+        appName() {
+            return appName;
+        },
         settings() {
             return this.$parent.$parent.$parent.settings;
         },
@@ -59,7 +68,6 @@ export default {
             return this.$parent.$parent.$parent.settingsLoaded;
         },
     },
-
     watch: {},
 };
 </script>

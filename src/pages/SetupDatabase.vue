@@ -3,7 +3,7 @@
         <form @submit.prevent="submit">
             <div>
                 <object width="64" height="64" data="/icon.svg" />
-                <div style="font-size: 28px; font-weight: bold; margin-top: 5px">Uptime Kuma</div>
+                <div style="font-size: 28px; font-weight: bold; margin-top: 5px">{{ appName }}</div>
             </div>
 
             <div v-if="info.runningSetup" class="mt-5">
@@ -178,7 +178,7 @@
 <script>
 import axios from "axios";
 import { useToast } from "vue-toastification";
-import { sleep } from "../util.ts";
+import { appName, sleep } from "../util.ts";
 const toast = useToast();
 
 export default {
@@ -208,6 +208,9 @@ export default {
         },
         isProvidedMariaDBSocket() {
             return this.info.isEnabledMariaDBSocket;
+        },
+        appName() {
+            return appName;
         },
     },
     async mounted() {

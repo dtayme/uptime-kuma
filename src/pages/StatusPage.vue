@@ -570,8 +570,8 @@
 
                 <p v-if="config.showPoweredBy" data-testid="powered-by">
                     {{ $t("Powered by") }}
-                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/louislam/uptime-kuma">
-                        {{ $t("Uptime Kuma") }}
+                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/dtayme/uptime-kuma">
+                        {{ appName }}
                     </a>
                 </p>
 
@@ -631,6 +631,7 @@ import {
     UP,
     MAINTENANCE,
 } from "../util.ts";
+import { appName } from "../util";
 import Tag from "../components/Tag.vue";
 import VueMultiselect from "vue-multiselect";
 
@@ -710,6 +711,9 @@ export default {
         };
     },
     computed: {
+        appName() {
+            return appName;
+        },
         logoURL() {
             if (this.imgDataUrl.startsWith("data:")) {
                 return this.imgDataUrl;

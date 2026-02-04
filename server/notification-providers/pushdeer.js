@@ -18,11 +18,11 @@ class PushDeer extends NotificationProvider {
 
         let title;
         if (valid && heartbeatJSON.status === UP) {
-            title = "## Uptime Kuma: " + monitorJSON.name + " up";
+            title = "## Uptime Kuma Distributed: " + monitorJSON.name + " up";
         } else if (valid && heartbeatJSON.status === DOWN) {
-            title = "## Uptime Kuma: " + monitorJSON.name + " down";
+            title = "## Uptime Kuma Distributed: " + monitorJSON.name + " down";
         } else {
-            title = "## Uptime Kuma Message";
+            title = "## Uptime Kuma Distributed Message";
         }
 
         let data = {
@@ -55,3 +55,4 @@ class PushDeer extends NotificationProvider {
 }
 
 module.exports = PushDeer;
+

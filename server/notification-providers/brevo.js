@@ -25,10 +25,10 @@ class Brevo extends NotificationProvider {
             let data = {
                 sender: {
                     email: notification.brevoFromEmail.trim(),
-                    name: notification.brevoFromName || "Uptime Kuma",
+                    name: notification.brevoFromName || "Uptime Kuma Distributed",
                 },
                 to: to,
-                subject: notification.brevoSubject || "Notification from Your Uptime Kuma",
+                subject: notification.brevoSubject || "Notification from Your Uptime Kuma Distributed",
                 htmlContent: `<html><head></head><body><p>${msg.replace(/\n/g, "<br>")}</p></body></html>`,
             };
 
@@ -53,3 +53,4 @@ class Brevo extends NotificationProvider {
 }
 
 module.exports = Brevo;
+

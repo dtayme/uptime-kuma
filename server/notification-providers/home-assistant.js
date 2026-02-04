@@ -25,13 +25,13 @@ class HomeAssistant extends NotificationProvider {
             await axios.post(
                 `${notification.homeAssistantUrl.trim().replace(/\/*$/, "")}/api/services/notify/${notificationService}`,
                 {
-                    title: "Uptime Kuma",
+                    title: "Uptime Kuma Distributed",
                     message: msg,
                     ...(notificationService !== "persistent_notification" && {
                         data: {
                             name: monitorJSON?.name,
                             status: heartbeatJSON?.status,
-                            channel: "Uptime Kuma",
+                            channel: "Uptime Kuma Distributed",
                             icon_url: "https://github.com/louislam/uptime-kuma/blob/master/public/icon.png?raw=true",
                         },
                     }),
@@ -47,3 +47,4 @@ class HomeAssistant extends NotificationProvider {
 }
 
 module.exports = HomeAssistant;
+

@@ -467,7 +467,7 @@ class Database {
             // Allow missing patch files for downgrade or testing pr.
             if (e.message.includes("the following files are missing:")) {
                 log.warn("db", e.message);
-                log.warn("db", "Database migration failed, you may be downgrading Uptime Kuma.");
+                log.warn("db", "Database migration failed, you may be downgrading Uptime Kuma Distributed.");
             } else {
                 log.error("db", "Database migration failed");
                 throw e;

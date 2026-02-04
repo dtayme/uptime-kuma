@@ -122,7 +122,7 @@ class SIPMonitorType extends MonitorType {
 
         const fromUri = this.normalizeSipUri(sipFrom, defaultUser, hostname, port);
         const contactUri = this.normalizeSipUri(sipContact, defaultUser, hostname, port);
-        const userAgent = (sipUserAgent || "Uptime Kuma").trim();
+        const userAgent = (sipUserAgent || "Uptime Kuma Distributed").trim();
 
         const requestUri = `sip:${hostname}:${port}`;
 
