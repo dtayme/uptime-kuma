@@ -1,4 +1,6 @@
 node_modules
+.npmrc
+uptimekuma-data/
 .DS_Store
 dist
 dist-ssr

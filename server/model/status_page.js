@@ -150,11 +150,20 @@ class StatusPage extends BeanModel {
         const { document } = parseHTML(indexHTML);
 
         const stripHtml = (html) => {
+            if (!html) {
+                return "";
+            }
+
             const { document: htmlDocument } = parseHTML(html);
+            if (!htmlDocument.documentElement) {
+                return "";
+            }
+
             if (htmlDocument.body) {
                 return htmlDocument.body.textContent || "";
             }
-            return htmlDocument.textContent || "";
+
+            return htmlDocument.documentElement.textContent || "";
         };
 
         const description155 = stripHtml(marked(statusPage.description ?? ""))
