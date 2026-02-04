@@ -40,7 +40,7 @@ async function waitForPostgresReady(connectionString) {
 
 /**
  * Helper function to create and start a Postgres container.
- * @returns {Promise<{container: import("testcontainers").StartedTestContainer, connectionString: string}>}
+ * @returns {Promise<{container: import("testcontainers").StartedTestContainer, connectionString: string}>} The started container and connection string.
  */
 async function createAndStartPostgresContainer() {
     const database = "test";

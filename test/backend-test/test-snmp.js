@@ -56,6 +56,10 @@ async function waitForSnmpReady(host, port, community, oid) {
 /**
  *
  */
+/**
+ * Get a free UDP port for the local SNMP agent.
+ * @returns {Promise<number>} The available UDP port.
+ */
 async function getFreeUdpPort() {
     return new Promise((resolve, reject) => {
         const socket = dgram.createSocket("udp4");
@@ -69,6 +73,10 @@ async function getFreeUdpPort() {
 
 /**
  *
+ */
+/**
+ * Start a local SNMP agent.
+ * @returns {import("net-snmp").Agent} The started agent.
  */
 function startSnmpAgent(port) {
     const agent = snmp.createAgent(

@@ -19,6 +19,10 @@ const MQTT_CONTAINER_TMPFS = {
 /**
  *
  */
+/**
+ * Start the MQTT broker container.
+ * @returns {Promise<import("testcontainers").StartedTestContainer>} The started container.
+ */
 async function startMqttContainer() {
     return new GenericContainer(MQTT_CONTAINER_IMAGE)
         .withExposedPorts(MQTT_CONTAINER_PORT)
@@ -35,7 +39,7 @@ let mqttPort;
 
 /**
  * Wait until the MQTT broker accepts a connection or the timeout elapses.
- * @returns {Promise<void>} Resolves when broker is ready.
+ * @returns {Promise<void>} Resolves when the broker is ready.
  */
 async function waitForMqttReady(connectionString) {
     const deadline = Date.now() + MQTT_READY_TIMEOUT_MS;
