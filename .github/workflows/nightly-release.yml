@@ -36,6 +36,8 @@ jobs:
         uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
           node-version: 20
+      - name: Upgrade npm
+        run: npm i -g npm@11
 
       - name: Cache/Restore node_modules
         uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1

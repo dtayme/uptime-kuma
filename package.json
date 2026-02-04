@@ -233,7 +233,10 @@
     "overrides": {
         "event-to-promise": "file:vendor/event-to-promise",
         "fast-xml-parser": "5.3.4",
-        "glob@~10.3.0": "10.5.0",
+        "glob": "10.5.0",
+        "workbox-build": {
+            "glob": "11.1.0"
+        },
         "lodash": "4.17.23",
         "sourcemap-codec": "npm:@jridgewell/sourcemap-codec@1.5.5",
         "source-map": "npm:source-map-js@1.2.1",

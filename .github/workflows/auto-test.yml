@@ -43,6 +43,8 @@ jobs:
         uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
           node-version: ${{ matrix.node }}
+      - name: Upgrade npm
+        run: npm i -g npm@11
       - run: npm clean-install --no-fund
 
       - name: Rebuild native modules for ARM64
@@ -84,7 +86,7 @@ jobs:
             -v $PWD:/workspace \
             -w /workspace \
             arm32v7/node:${{ matrix.node }} \
-            npm clean-install --no-fund --production
+            sh -c "npm i -g npm@11 && npm clean-install --no-fund --production"
 
   check-linters:
     runs-on: ubuntu-latest
@@ -107,6 +109,8 @@ jobs:
         uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
           node-version: 20
+      - name: Upgrade npm
+        run: npm i -g npm@11
       - run: npm clean-install --no-fund
       - run: npm run lint:prod
 
@@ -132,6 +136,8 @@ jobs:
         uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
           node-version: 22
+      - name: Upgrade npm
+        run: npm i -g npm@11
       - name: Install dependencies
         run: npm clean-install --no-fund
 
