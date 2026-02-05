@@ -7,6 +7,38 @@ const Database = require("../database");
 const apicache = require("../modules/apicache");
 const StatusPage = require("../model/status_page");
 const { UptimeKumaServer } = require("../uptime-kuma-server");
+const { Settings } = require("../settings");
+
+const DEFAULT_STATUS_PAGE_LOGO_MAX_BYTES = 1024 * 1024;
+
+/**
+ * Resolve the max status page logo size in bytes.
+ * @returns {Promise<number>} Max bytes (0 disables limit)
+ */
+async function getStatusPageLogoMaxBytes() {
+    const raw = await Settings.get("statusPageLogoMaxBytes");
+    const parsed = Number.parseInt(raw, 10);
+    if (Number.isFinite(parsed) && parsed >= 0) {
+        return parsed;
+    }
+    return DEFAULT_STATUS_PAGE_LOGO_MAX_BYTES;
+}
+
+/**
+ * Estimate decoded base64 size without allocating.
+ * @param {string} base64 Base64 payload
+ * @returns {number} Size in bytes
+ */
+function estimateBase64Size(base64) {
+    const trimmed = base64.trim();
+    let padding = 0;
+    if (trimmed.endsWith("==")) {
+        padding = 2;
+    } else if (trimmed.endsWith("=")) {
+        padding = 1;
+    }
+    return Math.floor((trimmed.length * 3) / 4) - padding;
+}
 
 /**
  * Validates incident data
@@ -309,6 +341,14 @@ module.exports.statusPageSocketHandler = (socket) => {
             if (imgDataUrl.startsWith("data:")) {
                 if (!imgDataUrl.startsWith(header)) {
                     throw new Error("Only allowed PNG logo.");
+                }
+
+                const base64Payload = imgDataUrl.slice(header.length);
+                const decodedSize = estimateBase64Size(base64Payload);
+                const maxBytes = await getStatusPageLogoMaxBytes();
+                if (maxBytes > 0 && decodedSize > maxBytes) {
+                    const maxMb = (maxBytes / (1024 * 1024)).toFixed(2);
+                    throw new Error(`Logo exceeds the maximum size (${maxMb} MB).`);
                 }
 
                 const filename = `logo${statusPage.id}.png`;

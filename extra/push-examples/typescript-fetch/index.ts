@@ -1,9 +1,21 @@
 // Supports: Deno, Bun, Node.js >= 18 (ts-node)
-const pushURL: string = "https://example.com/api/push/key?status=up&msg=OK&ping=";
+const pushURL: string = "https://example.com/api/push";
+const pushToken: string = "your-token";
 const interval: number = 60;
 
 const push = async () => {
-    await fetch(pushURL);
+    await fetch(pushURL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Push-Token": pushToken,
+        },
+        body: JSON.stringify({
+            status: "up",
+            msg: "OK",
+            ping: "",
+        }),
+    });
     console.log("Pushed!");
 };
 

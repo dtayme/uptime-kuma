@@ -13,24 +13,14 @@ FROM node:22-bookworm-slim AS base2-slim
 ARG TARGETPLATFORM
 
 # Specify --no-install-recommends to skip unused dependencies, make the base much smaller!
-# sqlite3 = for debugging
 # iputils-ping = for ping
-# util-linux = for setpriv (Should be dropped in 2.0.0?)
 # dumb-init = avoid zombie processes (#480)
-# curl = for debugging
 # ca-certificates = keep the cert up-to-date
-# sudo = for start service nscd with non-root user
-# nscd = for better DNS caching
 RUN apt update && \
     apt --yes --no-install-recommends install  \
-        sqlite3  \
         ca-certificates \
         iputils-ping  \
-        util-linux  \
-        dumb-init  \
-        curl  \
-        sudo \
-        nscd && \
+        dumb-init && \
     rm -rf /var/lib/apt/lists/* && \
     apt --yes autoremove
 
@@ -46,18 +36,16 @@ RUN apt update && \
     apt --yes autoremove
 
 # Install cloudflared
-RUN curl https://pkg.cloudflare.com/cloudflare-main.gpg --output /usr/share/keyrings/cloudflare-main.gpg && \
+RUN apt update && \
+    apt --yes --no-install-recommends install curl && \
+    curl https://pkg.cloudflare.com/cloudflare-main.gpg --output /usr/share/keyrings/cloudflare-main.gpg && \
     echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared bookworm main' | tee /etc/apt/sources.list.d/cloudflared.list && \
     apt update && \
     apt install --yes --no-install-recommends cloudflared && \
     cloudflared version && \
+    apt --yes purge curl && \
     rm -rf /var/lib/apt/lists/* && \
     apt --yes autoremove
-
-# For nscd
-COPY ./docker/etc/nscd.conf /etc/nscd.conf
-COPY ./docker/etc/sudoers /etc/sudoers
-
 
 # Full Base Image
 # MariaDB, Chromium and fonts

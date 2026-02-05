@@ -53,6 +53,7 @@ export default {
             notificationList: [],
             dockerHostList: [],
             remoteBrowserList: [],
+            pollerList: [],
             statusPageListLoaded: false,
             statusPageList: [],
             proxyList: [],
@@ -199,6 +200,10 @@ export default {
 
             socket.on("remoteBrowserList", (data) => {
                 this.remoteBrowserList = data;
+            });
+
+            socket.on("pollerList", (data) => {
+                this.pollerList = data;
             });
 
             socket.on("heartbeat", (data) => {
@@ -648,6 +653,42 @@ export default {
          */
         addAPIKey(key, callback) {
             socket.emit("addAPIKey", key, callback);
+        },
+
+        getPollerList(callback) {
+            socket.emit("getPollerList", callback);
+        },
+
+        getPollerRegistrationToken(callback) {
+            socket.emit("getPollerRegistrationToken", callback);
+        },
+
+        generatePollerRegistrationToken(callback) {
+            socket.emit("generatePollerRegistrationToken", callback);
+        },
+
+        getPollerDnsCacheSettings(callback) {
+            socket.emit("getPollerDnsCacheSettings", callback);
+        },
+
+        setPollerDnsCacheSettings(payload, callback) {
+            socket.emit("setPollerDnsCacheSettings", payload, callback);
+        },
+
+        rotatePollerToken(pollerId, callback) {
+            socket.emit("rotatePollerToken", pollerId, callback);
+        },
+
+        revokePollerTokens(pollerId, callback) {
+            socket.emit("revokePollerTokens", pollerId, callback);
+        },
+
+        updatePoller(payload, callback) {
+            socket.emit("updatePoller", payload, callback);
+        },
+
+        getPollerAssignmentPreview(pollerId, callback) {
+            socket.emit("getPollerAssignmentPreview", pollerId, callback);
         },
 
         /**

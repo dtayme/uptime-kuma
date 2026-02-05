@@ -42,6 +42,10 @@
                             </span>
                             <div class="flex-fill text-truncate" style="min-width: 0">
                                 <div class="text-truncate">{{ monitor.name }}</div>
+                                <div v-if="showPollerBadge" class="mt-1 d-flex flex-wrap gap-1">
+                                    <span class="badge bg-secondary">{{ pollerBadgeText }}</span>
+                                    <span v-if="isPollerStale" class="badge bg-warning text-dark">Stale</span>
+                                </div>
                                 <div v-if="monitor.tags.length > 0" class="tags gap-1">
                                     <Tag v-for="tag in monitor.tags" :key="tag" :item="tag" :size="'sm'" />
                                 </div>
@@ -89,6 +93,7 @@ import HeartbeatBar from "../components/HeartbeatBar.vue";
 import Tag from "../components/Tag.vue";
 import Uptime from "../components/Uptime.vue";
 import { getMonitorRelativeURL } from "../util.ts";
+import dayjs from "dayjs";
 
 export default {
     name: "MonitorListItem",
@@ -166,6 +171,51 @@ export default {
             return {
                 marginLeft: `${20 * this.depth}px`,
             };
+        },
+        pollerInfo() {
+            if (!this.monitor || this.monitor.pollerMode === "local" || !this.monitor.pollerMode) {
+                return null;
+            }
+            if (this.monitor.pollerMode === "pinned" && this.monitor.pollerId) {
+                return (this.$root.pollerList || []).find((poller) => poller.id === this.monitor.pollerId) || null;
+            }
+            return null;
+        },
+        showPollerBadge() {
+            return this.monitor && this.monitor.pollerMode && this.monitor.pollerMode !== "local";
+        },
+        pollerBadgeText() {
+            if (!this.showPollerBadge) {
+                return "";
+            }
+            if (this.monitor.pollerMode === "pinned") {
+                return this.pollerInfo ? `Poller: ${this.pollerInfo.name}` : "Poller: Unassigned";
+            }
+            if (this.monitor.pollerMode === "grouped") {
+                const region = this.monitor.pollerRegion || "region";
+                const dc = this.monitor.pollerDatacenter ? `/${this.monitor.pollerDatacenter}` : "";
+                return `Poller group: ${region}${dc}`;
+            }
+            return "Poller: Auto";
+        },
+        isPollerStale() {
+            if (!this.showPollerBadge) {
+                return false;
+            }
+            if (!this.pollerInfo) {
+                return true;
+            }
+            if (this.pollerInfo.status === "offline") {
+                return true;
+            }
+            if (!this.pollerInfo.lastHeartbeatAt) {
+                return true;
+            }
+            const last = dayjs(this.pollerInfo.lastHeartbeatAt);
+            if (!last.isValid()) {
+                return false;
+            }
+            return dayjs().diff(last, "second") > 60;
         },
     },
     watch: {

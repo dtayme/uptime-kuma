@@ -18,7 +18,7 @@ class Discord extends NotificationProvider {
 
         try {
             let config = this.getAxiosConfigWithProxy({});
-            const discordDisplayName = notification.discordUsername || "Uptime Kuma";
+            const discordDisplayName = notification.discordUsername || "Uptime Kuma Distributed";
             const webhookUrl = new URL(notification.discordWebhookUrl);
             if (notification.discordChannelType === "postToThread") {
                 webhookUrl.searchParams.append("thread_id", notification.threadId);
@@ -54,7 +54,8 @@ class Discord extends NotificationProvider {
                     content: content,
                 };
                 if (!webhookHasAvatar) {
-                    discordtestdata.avatar_url = "https://github.com/louislam/uptime-kuma/raw/master/public/icon.png";
+                    discordtestdata.avatar_url =
+                        "https://github.com/dtayme/uptime-kuma-distributed/raw/master/public/icon.png";
                 }
                 if (notification.discordChannelType === "createNewForumPost") {
                     discordtestdata.thread_name = notification.postName;
@@ -80,7 +81,7 @@ class Discord extends NotificationProvider {
                     content: content,
                 };
                 if (!webhookHasAvatar) {
-                    payload.avatar_url = "https://github.com/louislam/uptime-kuma/raw/master/public/icon.png";
+                    payload.avatar_url = "https://github.com/dtayme/uptime-kuma-distributed/raw/master/public/icon.png";
                 }
                 if (notification.discordChannelType === "createNewForumPost") {
                     payload.thread_name = notification.postName;
@@ -107,7 +108,7 @@ class Discord extends NotificationProvider {
                     content: content,
                 };
                 if (!webhookHasAvatar) {
-                    payload.avatar_url = "https://github.com/louislam/uptime-kuma/raw/master/public/icon.png";
+                    payload.avatar_url = "https://github.com/dtayme/uptime-kuma-distributed/raw/master/public/icon.png";
                 }
                 if (notification.discordChannelType === "createNewForumPost") {
                     payload.thread_name = notification.postName;
@@ -160,7 +161,8 @@ class Discord extends NotificationProvider {
                     ],
                 };
                 if (!webhookHasAvatar) {
-                    discorddowndata.avatar_url = "https://github.com/louislam/uptime-kuma/raw/master/public/icon.png";
+                    discorddowndata.avatar_url =
+                        "https://github.com/dtayme/uptime-kuma-distributed/raw/master/public/icon.png";
                 }
                 if (notification.discordChannelType === "createNewForumPost") {
                     discorddowndata.thread_name = notification.postName;
@@ -233,7 +235,8 @@ class Discord extends NotificationProvider {
                     ],
                 };
                 if (!webhookHasAvatar) {
-                    discordupdata.avatar_url = "https://github.com/louislam/uptime-kuma/raw/master/public/icon.png";
+                    discordupdata.avatar_url =
+                        "https://github.com/dtayme/uptime-kuma-distributed/raw/master/public/icon.png";
                 }
 
                 if (notification.discordChannelType === "createNewForumPost") {

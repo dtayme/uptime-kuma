@@ -4,7 +4,7 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/dtayme/uptime-kuma.git"
+        "url": "https://github.com/dtayme/uptime-kuma-distributed.git"
     },
     "engines": {
         "node": ">= 20.4.0"
@@ -25,6 +25,7 @@
         "start-server": "node server/server.js",
         "start-server-dev": "cross-env NODE_ENV=development node server/server.js",
         "start-server-dev:watch": "cross-env NODE_ENV=development node --watch server/server.js",
+        "start-poller": "node poller/index.js",
         "build": "vite build --config ./config/vite.config.js",
         "test": "npm run test-backend && npm run test-e2e",
         "test-with-build": "npm run build && npm test",
@@ -99,6 +100,7 @@
         "feed": "^4.2.2",
         "form-data": "~4.0.0",
         "gamedig": "^5.3.2",
+        "helmet": "^7.1.0",
         "html-escaper": "^3.0.3",
         "http-cookie-agent": "~5.0.4",
         "http-graceful-shutdown": "~3.1.7",

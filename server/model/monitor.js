@@ -167,6 +167,12 @@ class Monitor extends BeanModel {
             dns_resolve_type: this.dns_resolve_type,
             dns_resolve_server: this.dns_resolve_server,
             dns_last_result: this.dns_last_result,
+            pollerMode: this.pollerMode ?? this.poller_mode,
+            pollerId: this.pollerId ?? this.poller_id,
+            pollerRegion: this.pollerRegion ?? this.poller_region,
+            pollerDatacenter: this.pollerDatacenter ?? this.poller_datacenter,
+            pollerCapability: this.pollerCapability ?? this.poller_capability,
+            pollerDnsCacheDisabled: this.pollerDnsCacheDisabled ?? this.poller_dns_cache_disabled,
             docker_container: this.docker_container,
             docker_host: this.docker_host,
             proxyId: this.proxy_id,
@@ -475,7 +481,7 @@ class Monitor extends BeanModel {
             }
 
             // Runtime patch timeout if it is 0
-            // See https://github.com/louislam/uptime-kuma/pull/3961#issuecomment-1804149144
+            // See https://github.com/louislam/uptime-kuma/pull/3961#issuecomment-1804149144 (Last evaluated applicability: 2026-02-05.)
             if (!this.timeout || this.timeout <= 0) {
                 this.timeout = this.interval * 1000 * 0.8;
             }
@@ -1150,7 +1156,7 @@ class Monitor extends BeanModel {
             } catch (e) {
                 console.trace(e);
                 UptimeKumaServer.errorLog(e, false);
-                log.error("monitor", "Please report to https://github.com/louislam/uptime-kuma/issues");
+                log.error("monitor", "Please report to https://github.com/dtayme/uptime-kuma-distributed/issues");
 
                 if (!this.isStop) {
                     log.info("monitor", "Try to restart the monitor");

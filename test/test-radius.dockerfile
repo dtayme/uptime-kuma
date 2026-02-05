@@ -1,5 +1,5 @@
 # Container running a test radius server
-# More instructions in https://github.com/louislam/uptime-kuma/pull/1635
+# More instructions in https://github.com/dtayme/uptime-kuma-distributed/pull/1635 (Last evaluated applicability: 2026-02-05.)
 
 FROM freeradius/freeradius-server:latest
 
@@ -11,3 +11,4 @@ RUN echo "    secret = testing123"     >> /etc/raddb/clients.conf
 RUN echo "}"                           >> /etc/raddb/clients.conf
 
 RUN echo "bob Cleartext-Password := \"testpw\"" > /etc/raddb/mods-config/files/authorize
+

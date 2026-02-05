@@ -4,7 +4,7 @@
             <form @submit.prevent="submit">
                 <div>
                     <object width="64" height="64" data="/icon.svg" />
-                    <div style="font-size: 28px; font-weight: bold; margin-top: 5px">Uptime Kuma</div>
+                    <div style="font-size: 28px; font-weight: bold; margin-top: 5px">{{ appName }}</div>
                 </div>
 
                 <p class="mt-3">
@@ -73,6 +73,8 @@
 </template>
 
 <script>
+import { appName } from "../util";
+
 export default {
     data() {
         return {
@@ -81,6 +83,11 @@ export default {
             password: "",
             repeatPassword: "",
         };
+    },
+    computed: {
+        appName() {
+            return appName;
+        },
     },
     watch: {},
     mounted() {

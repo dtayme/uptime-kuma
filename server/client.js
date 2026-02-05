@@ -185,6 +185,48 @@ async function sendDockerHostList(socket) {
 }
 
 /**
+ * Emit poller list to client
+ * @param {Socket} socket Socket.io socket instance
+ * @returns {Promise<void>}
+ */
+async function sendPollerList(socket) {
+    const timeLogger = new TimeLogger();
+
+    const list = await R.find("poller");
+    const result = list.map((bean) => {
+        let capabilities = {};
+        if (bean.capabilities) {
+            try {
+                capabilities = JSON.parse(bean.capabilities);
+            } catch {
+                capabilities = {};
+            }
+        }
+
+        return {
+            id: bean.id,
+            name: bean.name,
+            region: bean.region,
+            datacenter: bean.datacenter,
+            capabilities,
+            version: bean.version,
+            status: bean.status,
+            queueDepth: bean.queue_depth,
+            assignmentVersion: bean.assignment_version,
+            weight: bean.weight,
+            lastHeartbeatAt: bean.last_heartbeat_at,
+            lastAssignmentPullAt: bean.last_assignment_pull_at,
+            lastResultsAt: bean.last_results_at,
+        };
+    });
+
+    io.to(socket.userID).emit("pollerList", result);
+    timeLogger.print("Sent Poller List");
+
+    return list;
+}
+
+/**
  * Send list of docker hosts to client
  * @param {Socket} socket Socket.io socket instance
  * @returns {Promise<Bean[]>} List of docker hosts
@@ -241,6 +283,7 @@ module.exports = {
     sendHeartbeatList,
     sendProxyList,
     sendAPIKeyList,
+    sendPollerList,
     sendInfo,
     sendDockerHostList,
     sendRemoteBrowserList,

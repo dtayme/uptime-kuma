@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Specialized;
 using System.Net;
 using System.Threading;
 
@@ -8,7 +9,8 @@ using System.Threading;
  */
 class Index
 {
-    const string PushURL  = "https://example.com/api/push/key?status=up&msg=OK&ping=";
+    const string PushURL  = "https://example.com/api/push";
+    const string PushToken = "your-token";
     const int Interval = 60;
 
     static void Main(string[] args)
@@ -16,7 +18,12 @@ class Index
         while (true)
         {
             WebClient client = new WebClient();
-            client.DownloadString(PushURL);
+            client.Headers.Add("X-Push-Token", PushToken);
+            client.UploadValues(PushURL, "POST", new NameValueCollection {
+                { "status", "up" },
+                { "msg", "OK" },
+                { "ping", "" },
+            });
             Console.WriteLine("Pushed!");
             Thread.Sleep(Interval * 1000);
         }

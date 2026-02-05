@@ -6,6 +6,26 @@ const { log } = require("../src/util");
 const { loginRateLimiter, apiRateLimiter } = require("./rate-limiter");
 const { Settings } = require("./settings");
 const dayjs = require("dayjs");
+const { UptimeKumaServer } = require("./uptime-kuma-server");
+
+const server = UptimeKumaServer.getInstance();
+
+/**
+ * Build a rate limit key for auth attempts.
+ * @param {express.Request} req Express request
+ * @param {string} username Username
+ * @param {string} prefix Key prefix
+ * @returns {Promise<string>} Rate limit key
+ */
+async function buildAuthRateLimitKey(req, username, prefix) {
+    const clientIP = await server.getClientIPwithProxy(
+        req.connection?.remoteAddress || req.socket?.remoteAddress || "",
+        req.headers
+    );
+    const normalizedUser = (username || "").trim().toLowerCase() || "unknown";
+    const normalizedIP = clientIP || "unknown";
+    return `${prefix}:${normalizedIP}:${normalizedUser}`;
+}
 
 /**
  * Login to web app
@@ -77,23 +97,22 @@ async function verifyAPIKey(key) {
  * @param {authCallback} callback Callback to handle login result
  * @returns {void}
  */
-function apiAuthorizer(username, password, callback) {
-    // API Rate Limit
-    apiRateLimiter.pass(null, 0).then((pass) => {
-        if (pass) {
-            verifyAPIKey(password).then((valid) => {
-                if (!valid) {
-                    log.warn("api-auth", "Failed API auth attempt: invalid API Key");
-                }
-                callback(null, valid);
-                // Only allow a set number of api requests per minute
-                // (currently set to 60)
-                apiRateLimiter.removeTokens(1);
-            });
-        } else {
-            log.warn("api-auth", "Failed API auth attempt: rate limit exceeded");
-            callback(null, false);
-        }
+function apiAuthorizer(req, username, password, callback) {
+    buildAuthRateLimitKey(req, username, "api").then((rateLimitKey) => {
+        apiRateLimiter.pass(rateLimitKey, null, 0).then((pass) => {
+            if (pass) {
+                verifyAPIKey(password).then((valid) => {
+                    if (!valid) {
+                        log.warn("api-auth", `Failed API auth attempt: invalid API Key (${rateLimitKey})`);
+                        apiRateLimiter.removeTokens(rateLimitKey, 1);
+                    }
+                    callback(null, valid);
+                });
+            } else {
+                log.warn("api-auth", `Failed API auth attempt: rate limit exceeded (${rateLimitKey})`);
+                callback(null, false);
+            }
+        });
     });
 }
 
@@ -104,22 +123,26 @@ function apiAuthorizer(username, password, callback) {
  * @param {authCallback} callback Callback to handle login result
  * @returns {void}
  */
-function userAuthorizer(username, password, callback) {
-    // Login Rate Limit
-    loginRateLimiter.pass(null, 0).then((pass) => {
-        if (pass) {
-            exports.login(username, password).then((user) => {
-                callback(null, user != null);
+function userAuthorizer(req, username, password, callback) {
+    buildAuthRateLimitKey(req, username, "login").then((rateLimitKey) => {
+        loginRateLimiter.pass(rateLimitKey, null, 0).then((pass) => {
+            if (pass) {
+                exports.login(username, password).then((user) => {
+                    callback(null, user != null);
 
-                if (user == null) {
-                    log.warn("basic-auth", "Failed basic auth attempt: invalid username/password");
-                    loginRateLimiter.removeTokens(1);
-                }
-            });
-        } else {
-            log.warn("basic-auth", "Failed basic auth attempt: rate limit exceeded");
-            callback(null, false);
-        }
+                    if (user == null) {
+                        log.warn(
+                            "basic-auth",
+                            `Failed basic auth attempt: invalid username/password (${rateLimitKey})`
+                        );
+                        loginRateLimiter.removeTokens(rateLimitKey, 1);
+                    }
+                });
+            } else {
+                log.warn("basic-auth", `Failed basic auth attempt: rate limit exceeded (${rateLimitKey})`);
+                callback(null, false);
+            }
+        });
     });
 }
 
@@ -132,7 +155,7 @@ function userAuthorizer(username, password, callback) {
  */
 exports.basicAuth = async function (req, res, next) {
     const middleware = basicAuth({
-        authorizer: userAuthorizer,
+        authorizer: (username, password, callback) => userAuthorizer(req, username, password, callback),
         authorizeAsync: true,
         challenge: true,
     });
@@ -159,13 +182,13 @@ exports.apiAuth = async function (req, res, next) {
         let middleware;
         if (usingAPIKeys) {
             middleware = basicAuth({
-                authorizer: apiAuthorizer,
+                authorizer: (username, password, callback) => apiAuthorizer(req, username, password, callback),
                 authorizeAsync: true,
                 challenge: true,
             });
         } else {
             middleware = basicAuth({
-                authorizer: userAuthorizer,
+                authorizer: (username, password, callback) => userAuthorizer(req, username, password, callback),
                 authorizeAsync: true,
                 challenge: true,
             });

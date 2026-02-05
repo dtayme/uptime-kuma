@@ -309,7 +309,11 @@ test.describe("Status Page", () => {
         await expect(page.getByTestId("edit-sidebar")).toHaveCount(0);
 
         // Fetch RSS feed again - should use custom RSS title
-        const rssResponseCustom = await page.request.get("/status/security-test/rss");
+        const rssResponseCustom = await page.request.get("/status/security-test/rss?no_cache=1", {
+            headers: {
+                "x-apicache-bypass": "1",
+            },
+        });
         expect(rssResponseCustom.status()).toBe(200);
         const rssContentCustom = await rssResponseCustom.text();
 

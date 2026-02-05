@@ -18,38 +18,148 @@ const { makeBadge } = require("badge-maker");
 const { Prometheus } = require("../prometheus");
 const Database = require("../database");
 const { UptimeCalculator } = require("../uptime-calculator");
+const { RateLimiter } = require("limiter");
 
 let router = express.Router();
 
 let cache = apicache.middleware;
 const server = UptimeKumaServer.getInstance();
 let io = server.io;
+const pushRateLimiters = new Map();
+const PUSH_RATE_LIMIT_TOKENS = 60;
+const PUSH_RATE_LIMIT_INTERVAL = "minute";
+const PUSH_RATE_LIMIT_MAX_ENTRIES = 5000;
+const PUSH_RATE_LIMIT_TTL_MS = 60 * 60 * 1000;
 
-router.get("/api/entry-page", async (request, response) => {
-    allowDevAllOrigin(response);
-
-    let result = {};
-    let hostname = request.hostname;
-    if ((await setting("trustProxy")) && request.headers["x-forwarded-host"]) {
-        hostname = request.headers["x-forwarded-host"];
+/**
+ * Extract push token from request (header preferred).
+ * @param {import("express").Request} request Express request
+ * @param {string|null} fallbackToken Fallback token (from URL param)
+ * @returns {string|null} Push token
+ */
+function getPushToken(request, fallbackToken = null) {
+    const authHeader = request.headers.authorization;
+    if (authHeader && authHeader.toLowerCase().startsWith("bearer ")) {
+        return authHeader.slice(7).trim();
     }
 
-    if (hostname in StatusPage.domainMappingList) {
-        result.type = "statusPageMatchedDomain";
-        result.statusPageSlug = StatusPage.domainMappingList[hostname];
+    const headerToken = request.headers["x-push-token"];
+    if (headerToken) {
+        return Array.isArray(headerToken) ? headerToken[0] : headerToken;
+    }
+
+    if (fallbackToken) {
+        return fallbackToken;
+    }
+
+    const bodyToken = request.body?.token;
+    if (bodyToken) {
+        return bodyToken;
+    }
+
+    const queryToken = request.query?.token;
+    if (queryToken) {
+        return queryToken;
+    }
+
+    return null;
+}
+
+/**
+ * Ensure push rate limiter entry for the given IP.
+ * @param {string} ip Client IP
+ * @returns {RateLimiter} Rate limiter instance
+ */
+function getPushRateLimiter(ip) {
+    const now = Date.now();
+    let entry = pushRateLimiters.get(ip);
+
+    if (entry && now - entry.lastSeen > PUSH_RATE_LIMIT_TTL_MS) {
+        pushRateLimiters.delete(ip);
+        entry = null;
+    }
+
+    if (!entry) {
+        entry = {
+            limiter: new RateLimiter({
+                tokensPerInterval: PUSH_RATE_LIMIT_TOKENS,
+                interval: PUSH_RATE_LIMIT_INTERVAL,
+                fireImmediately: true,
+            }),
+            lastSeen: now,
+        };
+        pushRateLimiters.set(ip, entry);
     } else {
-        result.type = "entryPage";
-        result.entryPage = server.entryPage;
+        entry.lastSeen = now;
     }
-    response.json(result);
-});
 
-router.all("/api/push/:pushToken", async (request, response) => {
+    if (pushRateLimiters.size > PUSH_RATE_LIMIT_MAX_ENTRIES) {
+        for (const [key, value] of pushRateLimiters) {
+            if (now - value.lastSeen > PUSH_RATE_LIMIT_TTL_MS) {
+                pushRateLimiters.delete(key);
+            }
+            if (pushRateLimiters.size <= PUSH_RATE_LIMIT_MAX_ENTRIES) {
+                break;
+            }
+        }
+    }
+
+    return entry.limiter;
+}
+
+/**
+ * Enforce per-IP rate limiting for push endpoint.
+ * @param {import("express").Request} request Express request
+ * @param {import("express").Response} response Express response
+ * @returns {Promise<boolean>} True if allowed
+ */
+async function checkPushRateLimit(request, response) {
+    const clientIP = await server.getClientIPwithProxy(
+        request.socket?.remoteAddress || request.connection?.remoteAddress,
+        request.headers
+    );
+    const limiter = getPushRateLimiter(clientIP || "unknown");
+    const remaining = await limiter.removeTokens(1);
+    if (remaining < 0) {
+        response.status(429).json({
+            ok: false,
+            msg: "Too frequently, try again later.",
+        });
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Handle push requests with optional token fallback.
+ * @param {import("express").Request} request Express request
+ * @param {import("express").Response} response Express response
+ * @param {string|null} fallbackToken Token from URL params
+ * @returns {Promise<void>}
+ */
+async function handlePushRequest(request, response, fallbackToken = null) {
+    if (!(await checkPushRateLimit(request, response))) {
+        return;
+    }
+
+    const payload = {
+        ...(request.query || {}),
+        ...(request.body || {}),
+    };
+
+    const pushToken = getPushToken(request, fallbackToken);
+    if (!pushToken) {
+        response.status(400).json({
+            ok: false,
+            msg: "Push token is required.",
+        });
+        return;
+    }
+
     try {
-        let pushToken = request.params.pushToken;
-        let msg = request.query.msg || "OK";
-        let ping = parseFloat(request.query.ping) || null;
-        let statusString = request.query.status || "up";
+        let msg = payload.msg || "OK";
+        let ping = parseFloat(payload.ping) || null;
+        let statusString = payload.status || "up";
         const statusFromParam = statusString === "up" ? UP : DOWN;
 
         // Validate ping value - max 100 billion ms (~3.17 years)
@@ -143,6 +253,35 @@ router.all("/api/push/:pushToken", async (request, response) => {
             msg: e.message,
         });
     }
+}
+
+router.get("/api/entry-page", async (request, response) => {
+    allowDevAllOrigin(response);
+
+    let result = {};
+    let hostname = request.hostname;
+    if ((await setting("trustProxy")) && request.headers["x-forwarded-host"]) {
+        hostname = request.headers["x-forwarded-host"];
+    }
+
+    if (hostname in StatusPage.domainMappingList) {
+        result.type = "statusPageMatchedDomain";
+        result.statusPageSlug = StatusPage.domainMappingList[hostname];
+    } else {
+        result.type = "entryPage";
+        result.entryPage = server.entryPage;
+    }
+    response.json(result);
+});
+
+// Legacy token in URL (GET or POST). Prefer header-based token with POST.
+router.all("/api/push/:pushToken", async (request, response) => {
+    await handlePushRequest(request, response, request.params.pushToken);
+});
+
+// New preferred endpoint: POST with token in header (X-Push-Token or Authorization: Bearer).
+router.post("/api/push", async (request, response) => {
+    await handlePushRequest(request, response);
 });
 
 router.get("/api/badge/:id/status", cache("5 minutes"), async (request, response) => {

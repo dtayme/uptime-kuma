@@ -122,6 +122,36 @@
                 <div class="form-text"></div>
             </div>
 
+            <!-- WebSocket Allowed Origins -->
+            <div class="mb-4">
+                <label class="form-label" for="webSocketAllowedOrigins">WebSocket Allowed Origins</label>
+                <input
+                    id="webSocketAllowedOrigins"
+                    v-model="settings.webSocketAllowedOrigins"
+                    class="form-control"
+                    name="webSocketAllowedOrigins"
+                    placeholder="https://status.example.com, https://app.example.com"
+                />
+                <div class="form-text">
+                    Comma-separated origins or hosts that are allowed to open WebSocket connections. Use this when you
+                    have multiple domains or reverse proxy hosts.
+                </div>
+            </div>
+
+            <!-- Status Page Logo Max Size -->
+            <div class="mb-4">
+                <label class="form-label" for="statusPageLogoMaxSize">Status Page Logo Max Size (MB)</label>
+                <input
+                    id="statusPageLogoMaxSize"
+                    v-model.number="statusPageLogoMaxMb"
+                    class="form-control"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                />
+                <div class="form-text">Set to 0 to disable the limit. Default is 1 MB.</div>
+            </div>
+
             <!-- Steam API Key -->
             <div class="mb-4">
                 <label class="form-label" for="steamAPIKey">
@@ -148,43 +178,6 @@
                 <i18n-t keypath="globalpingApiTokenDescription" tag="div" class="form-text">
                     <a href="https://dash.globalping.io" target="_blank">https://dash.globalping.io</a>
                 </i18n-t>
-            </div>
-
-            <!-- DNS Cache (nscd) -->
-            <div v-if="$root.info.isContainer" class="mb-4">
-                <label class="form-label">
-                    {{ $t("enableNSCD") }}
-                </label>
-
-                <div class="form-check">
-                    <input
-                        id="nscdEnable"
-                        v-model="settings.nscd"
-                        class="form-check-input"
-                        type="radio"
-                        name="nscd"
-                        :value="true"
-                        required
-                    />
-                    <label class="form-check-label" for="nscdEnable">
-                        {{ $t("Enable") }}
-                    </label>
-                </div>
-
-                <div class="form-check">
-                    <input
-                        id="nscdDisable"
-                        v-model="settings.nscd"
-                        class="form-check-input"
-                        type="radio"
-                        name="nscd"
-                        :value="false"
-                        required
-                    />
-                    <label class="form-check-label" for="nscdDisable">
-                        {{ $t("Disable") }}
-                    </label>
-                </div>
             </div>
 
             <!-- Chrome Executable -->
@@ -246,6 +239,23 @@ export default {
         },
         settingsLoaded() {
             return this.$parent.$parent.$parent.settingsLoaded;
+        },
+        statusPageLogoMaxMb: {
+            get() {
+                const bytes = this.settings.statusPageLogoMaxBytes;
+                if (!Number.isFinite(bytes)) {
+                    return 1;
+                }
+                return Math.round((bytes / (1024 * 1024)) * 100) / 100;
+            },
+            set(value) {
+                const parsed = Number.parseFloat(value);
+                if (!Number.isFinite(parsed) || parsed < 0) {
+                    this.settings.statusPageLogoMaxBytes = 0;
+                    return;
+                }
+                this.settings.statusPageLogoMaxBytes = Math.round(parsed * 1024 * 1024);
+            },
         },
         guessTimezone() {
             return dayjs.tz.guess();

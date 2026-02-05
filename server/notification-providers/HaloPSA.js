@@ -38,7 +38,7 @@ class HaloPSA extends NotificationProvider {
              * @type {object}
              */
             const payload = {
-                title: "Uptime Kuma Alert",
+                title: "Uptime Kuma Distributed Alert",
                 status: status,
                 monitor: monitorJSON?.name || "No Monitor",
                 message: msg,

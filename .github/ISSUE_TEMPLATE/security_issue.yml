@@ -36,7 +36,7 @@ body:
         Right-click the link below and select `Open link in new tab` to access the page.
         This will keep the security issue open, allowing you to easily return and paste the Advisory URL here later.
 
-        ➡️ [Create a New Security Advisory](https://github.com/louislam/uptime-kuma/security/advisories/new)
+        ➡️ [Create a New Security Advisory](https://github.com/dtayme/uptime-kuma-distributed/security/advisories/new)
 
         ## **Step 2: Share the Advisory URL**
 
@@ -51,4 +51,4 @@ body:
       label: GitHub Advisory URL for @louislam
       placeholder: |
         Please paste the GitHub Advisory URL here. Only the URL is required.
-        Example: https://github.com/louislam/uptime-kuma/security/advisories/GHSA-8h5r-7t6l-q3kz
+        Example: https://github.com/dtayme/uptime-kuma-distributed/security/advisories/GHSA-8h5r-7t6l-q3kz

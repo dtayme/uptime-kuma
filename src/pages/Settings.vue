@@ -115,6 +115,9 @@ export default {
                 "api-keys": {
                     title: this.$t("API Keys"),
                 },
+                pollers: {
+                    title: "Remote Pollers",
+                },
                 proxies: {
                     title: this.$t("Proxies"),
                 },
@@ -168,8 +171,8 @@ export default {
                     this.settings.entryPage = "dashboard";
                 }
 
-                if (this.settings.nscd === undefined) {
-                    this.settings.nscd = true;
+                if (this.settings.webSocketAllowedOrigins === undefined) {
+                    this.settings.webSocketAllowedOrigins = "";
                 }
 
                 if (this.settings.keepDataPeriodDays === undefined) {

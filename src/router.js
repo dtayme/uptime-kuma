@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound.vue";
 import DockerHosts from "./components/settings/Docker.vue";
 import ManageMaintenance from "./pages/ManageMaintenance.vue";
 import APIKeys from "./components/settings/APIKeys.vue";
+import Pollers from "./components/settings/Pollers.vue";
 import SetupDatabase from "./pages/SetupDatabase.vue";
 
 // Settings - Sub Pages
@@ -126,6 +127,10 @@ const routes = [
                             {
                                 path: "api-keys",
                                 component: APIKeys,
+                            },
+                            {
+                                path: "pollers",
+                                component: Pollers,
                             },
                             {
                                 path: "proxies",

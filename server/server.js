@@ -3,7 +3,7 @@
  * node "server/server.js"
  * DO NOT require("./server") in other modules, it likely creates circular dependency!
  */
-console.log("Welcome to Uptime Kuma");
+console.log("Welcome to Uptime Kuma Distributed");
 
 // As the log function need to use dayjs, it should be very top
 const dayjs = require("dayjs");
@@ -68,13 +68,16 @@ if (process.env.UPTIME_KUMA_WS_ORIGIN_CHECK === "bypass") {
 }
 
 const checkVersion = require("./check-version");
-log.info("server", "Uptime Kuma Version:", checkVersion.version);
+log.info("server", "Uptime Kuma Distributed Version:", checkVersion.version);
 
 log.info("server", "Loading modules");
 
 log.debug("server", "Importing express");
 const express = require("express");
 const expressStaticGzip = require("express-static-gzip");
+log.debug("server", "Importing helmet");
+const helmet = require("helmet");
+const { buildHelmetConfig, permissionsPolicyMiddleware } = require("./security-headers");
 log.debug("server", "Importing redbean-node");
 const { R } = require("redbean-node");
 log.debug("server", "Importing jsonwebtoken");
@@ -94,6 +97,8 @@ const { UptimeKumaServer } = require("./uptime-kuma-server");
 const server = UptimeKumaServer.getInstance();
 const io = (module.exports.io = server.io);
 const app = server.app;
+app.use(helmet(buildHelmetConfig(isDev)));
+app.use(permissionsPolicyMiddleware());
 
 log.debug("server", "Importing Monitor");
 const Monitor = require("./model/monitor");
@@ -209,6 +214,7 @@ const {
     sendProxyList,
     sendDockerHostList,
     sendAPIKeyList,
+    sendPollerList,
     sendRemoteBrowserList,
     sendMonitorTypeList,
 } = require("./client");
@@ -226,6 +232,7 @@ const { proxySocketHandler } = require("./socket-handlers/proxy-socket-handler")
 const { dockerSocketHandler } = require("./socket-handlers/docker-socket-handler");
 const { maintenanceSocketHandler } = require("./socket-handlers/maintenance-socket-handler");
 const { apiKeySocketHandler } = require("./socket-handlers/api-key-socket-handler");
+const { pollerSocketHandler } = require("./socket-handlers/poller-socket-handler");
 const { generalSocketHandler } = require("./socket-handlers/general-socket-handler");
 const { Settings } = require("./settings");
 const apicache = require("./modules/apicache");
@@ -392,12 +399,16 @@ let needSetup = false;
     app.use("/upload", express.static(Database.uploadDir));
 
     app.get("/.well-known/change-password", async (_, response) => {
-        response.redirect("https://github.com/louislam/uptime-kuma/wiki/Reset-Password-via-CLI");
+        response.redirect("https://github.com/dtayme/uptime-kuma-distributed/wiki/Reset-Password-via-CLI");
     });
 
     // API Router
     const apiRouter = require("./routers/api-router");
     app.use(apiRouter);
+
+    // Poller Router
+    const pollerRouter = require("./routers/poller-router");
+    app.use(pollerRouter);
 
     // Status Page Router
     const statusPageRouter = require("./routers/status-page-router");
@@ -489,7 +500,8 @@ let needSetup = false;
             }
 
             // Login Rate Limit
-            if (!(await loginRateLimiter.pass(callback))) {
+            const rateLimitKey = `socket:${clientIP}:${(data.username || "").trim().toLowerCase() || "unknown"}`;
+            if (!(await loginRateLimiter.pass(rateLimitKey, callback))) {
                 log.info("auth", `Too many failed requests for user ${data.username}. IP=${clientIP}`);
                 return;
             }
@@ -556,7 +568,8 @@ let needSetup = false;
 
         socket.on("logout", async (callback) => {
             // Rate Limit
-            if (!(await loginRateLimiter.pass(callback))) {
+            const clientIP = await server.getClientIP(socket);
+            if (!(await loginRateLimiter.pass(`socket:${clientIP}:logout`, callback))) {
                 return;
             }
 
@@ -585,7 +598,7 @@ let needSetup = false;
 
                     // Google authenticator doesn't like equal signs
                     // The fix is found at https://github.com/guyht/notp
-                    // Related issue: https://github.com/louislam/uptime-kuma/issues/486
+                    // Related issue: https://github.com/louislam/uptime-kuma/issues/486 (Last evaluated applicability: 2026-02-05.)
                     encodedSecret = encodedSecret.toString().replace(/=/g, "");
 
                     let uri = `otpauth://totp/Uptime%20Kuma:${user.username}?secret=${encodedSecret}`;
@@ -737,7 +750,7 @@ let needSetup = false;
 
                 if ((await R.knex("user").count("id as count").first()).count !== 0) {
                     throw new Error(
-                        "Uptime Kuma has been initialized. If you want to run setup again, please delete the database."
+                        "Uptime Kuma Distributed has been initialized. If you want to run setup again, please delete the database."
                     );
                 }
 
@@ -804,6 +817,14 @@ let needSetup = false;
                 // Map camelCase frontend property to snake_case database column
                 if (monitor.retryOnlyOnStatusCodeFailure !== undefined) {
                     bean.retry_only_on_status_code_failure = monitor.retryOnlyOnStatusCodeFailure;
+                }
+                if (monitor.pollerMode !== undefined) {
+                    bean.pollerMode = monitor.pollerMode;
+                    bean.pollerId = monitor.pollerId;
+                    bean.pollerRegion = monitor.pollerRegion;
+                    bean.pollerDatacenter = monitor.pollerDatacenter;
+                    bean.pollerCapability = monitor.pollerCapability;
+                    bean.pollerDnsCacheDisabled = monitor.pollerDnsCacheDisabled;
                 }
                 bean.user_id = socket.userID;
 
@@ -894,6 +915,12 @@ let needSetup = false;
                 bean.interval = monitor.interval;
                 bean.retryInterval = monitor.retryInterval;
                 bean.resendInterval = monitor.resendInterval;
+                bean.pollerMode = monitor.pollerMode;
+                bean.pollerId = monitor.pollerId;
+                bean.pollerRegion = monitor.pollerRegion;
+                bean.pollerDatacenter = monitor.pollerDatacenter;
+                bean.pollerCapability = monitor.pollerCapability;
+                bean.pollerDnsCacheDisabled = monitor.pollerDnsCacheDisabled;
                 bean.hostname = monitor.hostname;
                 bean.game = monitor.game;
                 bean.maxretries = monitor.maxretries;
@@ -1537,7 +1564,6 @@ let needSetup = false;
                 }
 
                 const previousChromeExecutable = await Settings.get("chromeExecutable");
-                const previousNSCDStatus = await Settings.get("nscd");
 
                 await setSettings("general", data);
                 server.entryPage = data.entryPage;
@@ -1551,15 +1577,6 @@ let needSetup = false;
                 if (previousChromeExecutable !== data.chromeExecutable) {
                     log.info("settings", "Chrome executable is changed. Resetting Chrome...");
                     await resetChrome();
-                }
-
-                // Update nscd status
-                if (previousNSCDStatus !== data.nscd) {
-                    if (data.nscd) {
-                        await server.startNSCDServices();
-                    } else {
-                        await server.stopNSCDServices();
-                    }
                 }
 
                 callback({
@@ -1752,6 +1769,7 @@ let needSetup = false;
         dockerSocketHandler(socket);
         maintenanceSocketHandler(socket);
         apiKeySocketHandler(socket);
+        pollerSocketHandler(socket);
         remoteBrowserSocketHandler(socket);
         generalSocketHandler(socket, server);
         chartSocketHandler(socket);
@@ -1855,6 +1873,7 @@ async function afterLogin(socket, user) {
         sendProxyList(socket),
         sendDockerHostList(socket),
         sendAPIKeyList(socket),
+        sendPollerList(socket),
         sendRemoteBrowserList(socket),
         sendMonitorTypeList(socket),
     ]);
@@ -1930,7 +1949,12 @@ async function startMonitor(userID, monitorID) {
     }
 
     server.monitorList[monitor.id] = monitor;
-    await monitor.start(io);
+    const pollerMode = monitor.pollerMode ?? monitor.poller_mode;
+    if (!pollerMode || pollerMode === "local") {
+        await monitor.start(io);
+    } else {
+        log.info("monitor", `Monitor ${monitorID} assigned to poller (${pollerMode}), skipping local start`);
+    }
 }
 
 /**
@@ -1975,7 +1999,12 @@ async function startMonitors() {
 
     for (let monitor of list) {
         try {
-            await monitor.start(io);
+            const pollerMode = monitor.pollerMode ?? monitor.poller_mode;
+            if (!pollerMode || pollerMode === "local") {
+                await monitor.start(io);
+            } else {
+                log.info("monitor", `Monitor ${monitor.id} assigned to poller (${pollerMode}), skipping local start`);
+            }
         } catch (e) {
             log.error("monitor", e);
         }
@@ -2034,7 +2063,9 @@ gracefulShutdown(server.httpServer, {
 let unexpectedErrorHandler = (error, promise) => {
     console.trace(error);
     UptimeKumaServer.errorLog(error, false);
-    console.error("If you keep encountering errors, please report to https://github.com/louislam/uptime-kuma/issues");
+    console.error(
+        "If you keep encountering errors, please report to https://github.com/dtayme/uptime-kuma-distributed/issues"
+    );
 };
 process.addListener("unhandledRejection", unexpectedErrorHandler);
 process.addListener("uncaughtException", unexpectedErrorHandler);
