@@ -120,6 +120,17 @@ docker run --rm \
   fognetx/uptimekuma:poller
 ```
 
+## ICMP Ping Privileges
+
+ICMP ping requires raw socket privileges. Granting `CAP_NET_RAW` (or setting `cap_net_raw` on `/bin/ping`)
+allows ICMP checks to run without full root, but it still expands the network‑level attack surface. Even in a
+rootless container, raw sockets can be abused for scanning or crafted traffic within the container network.
+
+Options to address this:
+- Prefer TCP/HTTP checks when possible (no extra privileges required).
+- Use a small sidecar ping proxy with `CAP_NET_RAW` and keep the poller container unprivileged.
+- If you must allow ICMP directly, add only `CAP_NET_RAW`, keep the filesystem read‑only, and drop all other caps.
+
 ## Notes
 
 - The poller currently runs in a safe "idle" mode if no `POLLER_ID` or `POLLER_TOKEN`
