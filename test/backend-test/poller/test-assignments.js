@@ -1,6 +1,7 @@
 const { describe, test, afterEach } = require("node:test");
 const assert = require("node:assert");
 const { R } = require("redbean-node");
+const { Settings } = require("../../../server/settings");
 
 const {
     buildAssignmentsForPoller,
@@ -11,9 +12,12 @@ const {
 } = require("../../../server/poller/assignments");
 
 const originalFind = R.find;
+const originalSettingsGet = Settings.get;
 
 afterEach(() => {
     R.find = originalFind;
+    Settings.get = originalSettingsGet;
+    Settings.stopCacheCleaner();
 });
 
 describe("Poller assignments", () => {
@@ -115,6 +119,8 @@ describe("Poller assignments", () => {
             }
             return [];
         };
+
+        Settings.get = async () => undefined;
 
         const assignments = await buildAssignmentsForPoller(pollerA);
         const ids = assignments.map((entry) => entry.monitor_id).sort((a, b) => a - b);
