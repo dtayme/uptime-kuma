@@ -2,7 +2,7 @@ const { BeanModel } = require("redbean-node/dist/bean-model");
 const passwordHash = require("../password-hash");
 const { R } = require("redbean-node");
 const jwt = require("jsonwebtoken");
-const { shake256, SHAKE256_LENGTH } = require("../util-server");
+const { jwtPasswordMarker } = require("../util-server");
 
 class User extends BeanModel {
     /**
@@ -42,7 +42,7 @@ class User extends BeanModel {
         return jwt.sign(
             {
                 username: user.username,
-                h: shake256(user.password, SHAKE256_LENGTH),
+                h: jwtPasswordMarker(user.password, jwtSecret),
             },
             jwtSecret
         );

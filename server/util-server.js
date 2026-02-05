@@ -840,6 +840,19 @@ module.exports.shake256 = (data, len) => {
 };
 
 /**
+ * Create a stable JWT password marker using a server secret.
+ * @param {string} hashedPassword Stored password hash
+ * @param {string} jwtSecret Server JWT secret
+ * @returns {string} HMAC digest in hex format
+ */
+module.exports.jwtPasswordMarker = (hashedPassword, jwtSecret) => {
+    if (!hashedPassword) {
+        return "";
+    }
+    return crypto.createHmac("sha256", jwtSecret).update(hashedPassword).digest("hex");
+};
+
+/**
  * Non await sleep
  * Source: https://stackoverflow.com/questions/59099454/is-there-a-way-to-call-sleep-without-await-keyword
  * @param {number} n Milliseconds to wait
