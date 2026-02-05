@@ -7,8 +7,9 @@
 Uptime Kuma Distributed is an easy-to-use self-hosted monitoring tool, forked from Uptime Kuma by Louis Lam.
 
 <a target="_blank" href="https://github.com/dtayme/uptime-kuma-distributed"><img src="https://img.shields.io/github/stars/dtayme/uptime-kuma-distributed?style=flat" /></a> <a target="_blank" href="https://hub.docker.com/r/fognetx/uptimekuma"><img src="https://img.shields.io/docker/pulls/fognetx/uptimekuma" /></a> <a target="_blank" href="https://hub.docker.com/r/fognetx/uptimekuma"><img src="https://img.shields.io/docker/v/fognetx/uptimekuma?label=docker%20image%20ver." /></a> <a target="_blank" href="https://github.com/dtayme/uptime-kuma-distributed"><img src="https://img.shields.io/github/last-commit/dtayme/uptime-kuma-distributed" /></a>
-<a href="https://weblate.kuma.pet/projects/uptime-kuma/uptime-kuma/">
-</a>
+<a href="https://weblate.kuma.pet/projects/uptime-kuma/uptime-kuma/"></a>
+
+[![Auto Test](https://github.com/dtayme/uptime-kuma-distributed/actions/workflows/auto-test.yml/badge.svg)](https://github.com/dtayme/uptime-kuma-distributed/actions/workflows/auto-test.yml)
 
 ## ⭐ Features
 
