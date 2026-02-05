@@ -5,6 +5,10 @@ const basicAuth = require("express-basic-auth");
 
 const { loginRateLimiter } = require("../../server/rate-limiter");
 
+/**
+ * Create a test server with basic auth + rate limiting.
+ * @returns {Promise<import("http").Server>} HTTP server
+ */
 function createServer() {
     const app = express();
     app.use(
@@ -36,6 +40,13 @@ function createServer() {
     });
 }
 
+/**
+ * Issue a basic-auth request to the test server.
+ * @param {import("http").Server} server Server instance
+ * @param {string} username Username
+ * @param {string} password Password
+ * @returns {Promise<Response>} Fetch response
+ */
 async function request(server, username, password) {
     const { port } = server.address();
     const auth = Buffer.from(`${username}:${password}`).toString("base64");

@@ -17,6 +17,10 @@ const MQTT_CONTAINER_TMPFS = {
     "/opt/hivemq/data": "rw",
 };
 
+/**
+ * Start the MQTT test container.
+ * @returns {Promise<import("testcontainers").StartedTestContainer>} Started container
+ */
 async function startMqttContainer() {
     return new GenericContainer(MQTT_CONTAINER_IMAGE)
         .withExposedPorts(MQTT_CONTAINER_PORT)
@@ -26,6 +30,11 @@ async function startMqttContainer() {
         .start();
 }
 
+/**
+ * Wait until the MQTT broker is accepting connections.
+ * @param {string} connectionString Connection URL
+ * @returns {Promise<void>} Resolves when broker is ready
+ */
 async function waitForMqttReady(connectionString) {
     const deadline = Date.now() + MQTT_READY_TIMEOUT_MS;
     let lastError = null;
@@ -136,7 +145,7 @@ describe(
                 });
 
                 assert.strictEqual(result.status, UP);
-                assert.match(result.msg, /Topic: poller\\/test/);
+                assert.match(result.msg, /Topic: poller\/test/);
             } finally {
                 await new Promise((resolve) => {
                     client.publish(topic, "", { retain: true }, resolve);

@@ -10,6 +10,11 @@ try {
 
 const { buildHelmetConfig } = require("../../server/security-headers");
 
+/**
+ * Create a test server with Helmet configured.
+ * @param {boolean} isDev Whether to use dev config
+ * @returns {Promise<{server: import("http").Server, baseUrl: string}>} Server and base URL
+ */
 async function createServer(isDev) {
     const app = express();
     if (!helmet) {
@@ -29,6 +34,12 @@ async function createServer(isDev) {
     return { server, baseUrl };
 }
 
+/**
+ * Read a header value as a string.
+ * @param {Response} response Fetch response
+ * @param {string} name Header name
+ * @returns {string} Header value
+ */
 function getHeader(response, name) {
     return response.headers.get(name) || "";
 }

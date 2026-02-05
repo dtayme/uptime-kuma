@@ -10,6 +10,11 @@ const MYSQL_READY_TIMEOUT_MS = 60000;
 const MYSQL_READY_RETRY_DELAY_MS = 1000;
 const MYSQL_READY_CONNECT_TIMEOUT_MS = 5000;
 
+/**
+ * Wait for MariaDB to accept connections.
+ * @param {string} connectionString Connection string
+ * @returns {Promise<void>} Resolves when ready
+ */
 async function waitForMariaDbReady(connectionString) {
     const deadline = Date.now() + MYSQL_READY_TIMEOUT_MS;
     let lastError = null;
@@ -50,6 +55,10 @@ async function waitForMariaDbReady(connectionString) {
     throw new Error(message);
 }
 
+/**
+ * Start a MariaDB container for integration tests.
+ * @returns {Promise<{container: import("testcontainers").StartedTestContainer, connectionString: string}>} Container details
+ */
 async function createAndStartMariaDBContainer() {
     const database = "test";
     const username = "test";

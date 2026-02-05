@@ -129,7 +129,7 @@ async function ensureRedisConnected() {
  * Try to read a cached DNS entry from Redis.
  * @param {string} hostname Hostname
  * @param {number} family Address family
- * @returns {Promise<{addresses: {address:string,family:number}[], ttlSeconds: number}|null>}
+ * @returns {Promise<{addresses: {address:string,family:number}[], ttlSeconds: number}|null>} Cached entry or null
  */
 async function readRedisDnsCache(hostname, family) {
     try {
@@ -211,7 +211,7 @@ function shouldUseSystemLookup(hostname) {
  * Resolve hostname using system DNS (dns.lookup).
  * @param {string} hostname Hostname
  * @param {number} family Address family (0,4,6)
- * @returns {Promise<{addresses: {address:string,family:number}[], ttlSeconds: number|null}>}
+ * @returns {Promise<{addresses: {address:string,family:number}[], ttlSeconds: number|null}>} Resolved addresses and TTL
  */
 async function resolveWithSystemLookup(hostname, family) {
     const results = await dns.promises.lookup(hostname, {
@@ -232,7 +232,7 @@ async function resolveWithSystemLookup(hostname, family) {
  * Resolve hostname using a custom resolver (supports TTL).
  * @param {string} hostname Hostname
  * @param {number} family Address family (0,4,6)
- * @returns {Promise<{addresses: {address:string,family:number}[], ttlSeconds: number|null}>}
+ * @returns {Promise<{addresses: {address:string,family:number}[], ttlSeconds: number|null}>} Resolved addresses and TTL
  */
 async function resolveWithCustomResolver(hostname, family) {
     const tasks = [];
@@ -291,7 +291,7 @@ async function resolveWithCustomResolver(hostname, family) {
  * @param {number} family Address family
  * @param {number} maxTtlSeconds Max TTL in seconds
  * @param {boolean} cacheDisabled Whether caching is disabled
- * @returns {Promise<{address:string,family:number}[]>}
+ * @returns {Promise<{address:string,family:number}[]>} Resolved address list
  */
 async function resolveWithCache(hostname, family, maxTtlSeconds, cacheDisabled) {
     if (!hostname) {
@@ -363,7 +363,7 @@ async function resolveWithCache(hostname, family, maxTtlSeconds, cacheDisabled) 
 /**
  * Build a lookup function for poller checks.
  * @param {object} config Monitor config
- * @returns {(hostname: string, options: object, callback: function) => void}
+ * @returns {(hostname: string, options: object, callback: function) => void} Lookup callback
  */
 function createPollerLookup(config) {
     const maxTtl = Number.parseInt(config.pollerDnsCacheMaxTtlSeconds, 10);

@@ -5,15 +5,23 @@ const path = require("path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 
+/**
+ * Resolve client IP from test headers.
+ * @param {string} _remoteAddress Remote address
+ * @param {Record<string, string>} headers Request headers
+ * @returns {Promise<string>} Client IP
+ */
+async function getClientIPwithProxy(_remoteAddress, headers) {
+    return headers["x-test-ip"] || "127.0.0.1";
+}
+
 const stubServer = {
     io: {
         to() {
             return { emit() {} };
         },
     },
-    async getClientIPwithProxy(_remoteAddress, headers) {
-        return headers["x-test-ip"] || "127.0.0.1";
-    },
+    getClientIPwithProxy,
 };
 
 const stubUptimeKumaServer = {
@@ -78,9 +86,19 @@ const stubUptimeCalculator = {
 };
 
 class StubPrometheus {
+    /**
+     * No-op metrics update for tests.
+     * @returns {void}
+     */
     update() {}
 }
 
+/**
+ * Register a stub module in Node's require cache.
+ * @param {string} modulePath Module path
+ * @param {object} exports Module exports
+ * @returns {void}
+ */
 function stubModule(modulePath, exports) {
     require.cache[modulePath] = {
         id: modulePath,
@@ -98,6 +116,10 @@ stubModule(path.join(repoRoot, "server", "prometheus.js"), { Prometheus: StubPro
 
 const router = require(path.join(repoRoot, "server", "routers", "api-router.js"));
 
+/**
+ * Create a test express server with the API router.
+ * @returns {Promise<{server: import("http").Server, request: function}>} Server and request helper
+ */
 async function createTestServer() {
     const app = express();
     app.use(express.json());
@@ -111,6 +133,12 @@ async function createTestServer() {
     const { port } = server.address();
     const baseUrl = `http://127.0.0.1:${port}`;
 
+    /**
+     * Issue a request against the test server.
+     * @param {string} pathname Path
+     * @param {RequestInit} options Fetch options
+     * @returns {Promise<{status: number, body: object}>} Response payload
+     */
     async function request(pathname, options = {}) {
         const res = await fetch(`${baseUrl}${pathname}`, options);
         let body;

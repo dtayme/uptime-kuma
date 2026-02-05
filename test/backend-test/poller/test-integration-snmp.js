@@ -10,6 +10,14 @@ const SNMP_READY_TIMEOUT_MS = 60000;
 const SNMP_READY_RETRY_DELAY_MS = 1000;
 const SNMP_READY_CONNECT_TIMEOUT_MS = 2000;
 
+/**
+ * Wait for the SNMP agent to respond to a query.
+ * @param {string} host Hostname
+ * @param {number} port Port
+ * @param {string} community Community string
+ * @param {string} oid OID to query
+ * @returns {Promise<void>} Resolves when agent is ready
+ */
 async function waitForSnmpReady(host, port, community, oid) {
     const deadline = Date.now() + SNMP_READY_TIMEOUT_MS;
     let lastError = null;
@@ -50,6 +58,10 @@ async function waitForSnmpReady(host, port, community, oid) {
     throw new Error(message);
 }
 
+/**
+ * Allocate a free UDP port for the local SNMP agent.
+ * @returns {Promise<number>} Free UDP port
+ */
 async function getFreeUdpPort() {
     return new Promise((resolve, reject) => {
         const socket = dgram.createSocket("udp4");
@@ -61,6 +73,11 @@ async function getFreeUdpPort() {
     });
 }
 
+/**
+ * Start a local SNMP agent for tests.
+ * @param {number} port UDP port
+ * @returns {import("net-snmp").Agent} SNMP agent instance
+ */
 function startSnmpAgent(port) {
     const agent = snmp.createAgent(
         {

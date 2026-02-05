@@ -1,6 +1,5 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const express = require("express");
 const path = require("path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
@@ -42,7 +41,6 @@ const stubImageDataURI = {
 };
 
 let storedStatusPage = null;
-let storedGroup = null;
 const stubR = {
     async findOne(_table, _where, params) {
         if (_table === "status_page" && params?.[0] === "test") {
@@ -77,14 +75,17 @@ const stubR = {
         if (bean && bean.slug) {
             storedStatusPage = bean;
         }
-        if (bean && bean.group_id) {
-            storedGroup = bean;
-        }
         return bean;
     },
     async exec() {},
 };
 
+/**
+ * Register a stub module in Node's require cache.
+ * @param {string} modulePath Module path
+ * @param {object} exports Module exports
+ * @returns {void}
+ */
 function stubModule(modulePath, exports) {
     require.cache[modulePath] = {
         id: modulePath,
@@ -104,6 +105,10 @@ stubModule(path.join(repoRoot, "server", "modules", "apicache.js"), { clear() {}
 
 const { statusPageSocketHandler } = require(path.join(repoRoot, "server", "socket-handlers", "status-page-socket-handler.js"));
 
+/**
+ * Create a lightweight socket stub for status page handlers.
+ * @returns {{on: function, emit: function, handlers: Map, userID: number}} Socket stub
+ */
 function createSocket() {
     const handlers = new Map();
     return {
@@ -121,6 +126,11 @@ function createSocket() {
     };
 }
 
+/**
+ * Build a PNG data URI payload of the requested size.
+ * @param {number} byteLength Raw payload size
+ * @returns {string} Data URI
+ */
 function makeDataUri(byteLength) {
     const payload = "A".repeat(byteLength);
     const base64 = Buffer.from(payload).toString("base64");

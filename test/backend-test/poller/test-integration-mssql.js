@@ -5,6 +5,10 @@ const { MSSQLServerContainer } = require("@testcontainers/mssqlserver");
 const { executeAssignment } = require("../../../poller/executor");
 const { UP } = require("../../../src/util");
 
+/**
+ * Start a test MSSQL container.
+ * @returns {Promise<{container: import("@testcontainers/mssqlserver").StartedMSSQLServerContainer, connectionString: string}>} Container details
+ */
 async function createAndStartMSSQLContainer() {
     const container = await new MSSQLServerContainer("mcr.microsoft.com/mssql/server:2022-latest")
         .acceptLicense()
