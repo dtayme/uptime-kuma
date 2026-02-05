@@ -14,11 +14,13 @@ Long-running stress tests:
 Set `TEST_LONG=1` to enable opt-in stress tests (for example the year-long `UptimeCalculator` simulation).
 
 Backend test locations:
+
 - `test/backend-test/*.js` core backend/unit tests
 - `test/backend-test/monitors/*.js` monitor-type tests
 - `test/backend-test/poller/*.js` poller logic and integration tests
 
 **Backend Tests (Core)**
+
 - `test/backend-test/check-translations.test.js` translation key coverage and placeholder checks
 - `test/backend-test/test-auth-rate-limiter.js` rate limiter behavior keyed per user/IP
 - `test/backend-test/test-cert-hostname-match.js` TLS hostname validation
@@ -38,6 +40,7 @@ Backend test locations:
 - `test/backend-test/test-util.js` shared utility helpers
 
 **Backend Tests (Monitors)**
+
 - `test/backend-test/monitors/test-gamedig.js` GameDig monitor behavior
 - `test/backend-test/monitors/test-grpc.js` gRPC keyword monitor behavior
 - `test/backend-test/monitors/test-mqtt.js` MQTT monitor behavior
@@ -49,6 +52,7 @@ Backend test locations:
 - `test/backend-test/monitors/test-websocket.js` WebSocket monitor behavior
 
 **Backend Tests (Poller)**
+
 - `test/backend-test/poller/test-api-client.js` poller API client behavior
 - `test/backend-test/poller/test-assignments.js` poller assignment logic
 - `test/backend-test/poller/test-executor.js` poller execution pipeline
@@ -67,6 +71,7 @@ Run end-to-end tests:
 The Playwright config lives at `config/playwright.config.js` and spins up the app on `http://localhost:30001`.
 
 **E2E Tests**
+
 - `test/e2e/specs/example.spec.js` example smoke flow
 - `test/e2e/specs/fridendly-name.spec.js` friendly name UI behavior
 - `test/e2e/specs/incident-history.spec.js` incident history UI behavior
@@ -75,5 +80,6 @@ The Playwright config lives at `config/playwright.config.js` and spins up the ap
 - `test/e2e/specs/status-page.spec.js` status page UI behavior
 
 **Notes**
+
 - Some suites rely on external services or containers (e.g., database or broker tests). Check their test files for setup details.
 - CI may skip long-running tests by default; use `TEST_LONG=1` locally to opt in.

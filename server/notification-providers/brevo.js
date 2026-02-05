@@ -53,4 +53,3 @@ class Brevo extends NotificationProvider {
 }
 
 module.exports = Brevo;
-

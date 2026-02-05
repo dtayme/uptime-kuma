@@ -155,8 +155,7 @@ function buildMonitorConfig(monitor, options = {}) {
         snmp_v3_username: monitor.snmp_v3_username,
         conditions: monitor.conditions,
         pollerDnsCacheDisabled: monitor.pollerDnsCacheDisabled ?? monitor.poller_dns_cache_disabled ?? false,
-        pollerDnsCacheMaxTtlSeconds:
-            pollerDnsCacheMaxTtlSeconds ?? DEFAULT_POLLER_DNS_CACHE_MAX_TTL_SECONDS,
+        pollerDnsCacheMaxTtlSeconds: pollerDnsCacheMaxTtlSeconds ?? DEFAULT_POLLER_DNS_CACHE_MAX_TTL_SECONDS,
     };
 }
 
@@ -178,17 +177,12 @@ async function buildAssignmentsForPoller(poller) {
     const rawMaxTtl = await Settings.get("pollerDnsCacheMaxTtlSeconds");
     const parsedMaxTtl = Number.parseInt(rawMaxTtl, 10);
     const pollerDnsCacheMaxTtlSeconds =
-        Number.isFinite(parsedMaxTtl) && parsedMaxTtl >= 0
-            ? parsedMaxTtl
-            : DEFAULT_POLLER_DNS_CACHE_MAX_TTL_SECONDS;
+        Number.isFinite(parsedMaxTtl) && parsedMaxTtl >= 0 ? parsedMaxTtl : DEFAULT_POLLER_DNS_CACHE_MAX_TTL_SECONDS;
     const pollers = await R.find("poller");
     const onlinePollers = pollers.filter((p) => p.status !== "offline");
     const pollerCaps = parseCapabilities(poller.capabilities);
 
-    const monitors = await R.find(
-        "monitor",
-        " active = 1 AND poller_mode IS NOT NULL AND poller_mode != 'local' "
-    );
+    const monitors = await R.find("monitor", " active = 1 AND poller_mode IS NOT NULL AND poller_mode != 'local' ");
 
     const assignments = [];
 

@@ -279,5 +279,3 @@ class Prometheus {
 module.exports = {
     Prometheus,
 };
-
-

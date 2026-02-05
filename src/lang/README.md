@@ -18,4 +18,3 @@
 5. Commit and make a pull request for me to approve
 
 If you do not have programming skills, let me know in [the issues section](https://github.com/dtayme/uptime-kuma-distributed/issues). I will assist you. 😏
-

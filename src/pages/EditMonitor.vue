@@ -143,13 +143,15 @@
                             <div class="my-3">
                                 <label class="form-label">Poller Mode</label>
                                 <select v-model="monitor.pollerMode" class="form-select">
-                                    <option v-for="option in pollerModeOptions" :key="option.value" :value="option.value">
+                                    <option
+                                        v-for="option in pollerModeOptions"
+                                        :key="option.value"
+                                        :value="option.value"
+                                    >
                                         {{ option.label }}
                                     </option>
                                 </select>
-                                <div class="form-text">
-                                    Select where this monitor should run.
-                                </div>
+                                <div class="form-text">Select where this monitor should run.</div>
                             </div>
 
                             <div v-if="monitor.pollerMode === 'grouped'" class="my-3">
@@ -184,9 +186,7 @@
                                         Disable poller DNS cache for this monitor
                                     </label>
                                 </div>
-                                <div class="form-text">
-                                    Use this for targets with frequently changing DNS records.
-                                </div>
+                                <div class="form-text">Use this for targets with frequently changing DNS records.</div>
                             </div>
 
                             <!-- Manual Status switcher -->

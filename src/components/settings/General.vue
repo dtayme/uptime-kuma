@@ -124,9 +124,7 @@
 
             <!-- WebSocket Allowed Origins -->
             <div class="mb-4">
-                <label class="form-label" for="webSocketAllowedOrigins">
-                    WebSocket Allowed Origins
-                </label>
+                <label class="form-label" for="webSocketAllowedOrigins">WebSocket Allowed Origins</label>
                 <input
                     id="webSocketAllowedOrigins"
                     v-model="settings.webSocketAllowedOrigins"
@@ -135,16 +133,14 @@
                     placeholder="https://status.example.com, https://app.example.com"
                 />
                 <div class="form-text">
-                    Comma-separated origins or hosts that are allowed to open WebSocket connections.
-                    Use this when you have multiple domains or reverse proxy hosts.
+                    Comma-separated origins or hosts that are allowed to open WebSocket connections. Use this when you
+                    have multiple domains or reverse proxy hosts.
                 </div>
             </div>
 
             <!-- Status Page Logo Max Size -->
             <div class="mb-4">
-                <label class="form-label" for="statusPageLogoMaxSize">
-                    Status Page Logo Max Size (MB)
-                </label>
+                <label class="form-label" for="statusPageLogoMaxSize">Status Page Logo Max Size (MB)</label>
                 <input
                     id="statusPageLogoMaxSize"
                     v-model.number="statusPageLogoMaxMb"
@@ -153,9 +149,7 @@
                     min="0"
                     step="0.1"
                 />
-                <div class="form-text">
-                    Set to 0 to disable the limit. Default is 1 MB.
-                </div>
+                <div class="form-text">Set to 0 to disable the limit. Default is 1 MB.</div>
             </div>
 
             <!-- Steam API Key -->

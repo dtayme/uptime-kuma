@@ -52,4 +52,3 @@ body:
       placeholder: |
         Please paste the GitHub Advisory URL here. Only the URL is required.
         Example: https://github.com/dtayme/uptime-kuma-distributed/security/advisories/GHSA-8h5r-7t6l-q3kz
-

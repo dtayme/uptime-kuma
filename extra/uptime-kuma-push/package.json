@@ -11,4 +11,3 @@
         "build-linux-riscv64": "cross-env GOOS=linux GOARCH=riscv64 go build -x -o ./build/uptime-kuma-push-riscv64 uptime-kuma-push.go"
     }
 }
-

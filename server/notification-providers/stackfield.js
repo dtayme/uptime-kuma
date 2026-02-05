@@ -42,4 +42,3 @@ class Stackfield extends NotificationProvider {
 }
 
 module.exports = Stackfield;
-

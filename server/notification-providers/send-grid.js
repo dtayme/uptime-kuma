@@ -55,4 +55,3 @@ class SendGrid extends NotificationProvider {
 }
 
 module.exports = SendGrid;
-

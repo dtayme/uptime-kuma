@@ -103,4 +103,3 @@ class JiraServiceManagement extends NotificationProvider {
 }
 
 module.exports = JiraServiceManagement;
-

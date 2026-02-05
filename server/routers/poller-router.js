@@ -304,7 +304,11 @@ function determineStatus(status, previousHeartbeat, maxretries, isUpsideDown, be
                 bean.retries = 0;
                 bean.status = DOWN;
             }
-        } else if (previousHeartbeat.status === PENDING && nextStatus === DOWN && previousHeartbeat.retries < maxretries) {
+        } else if (
+            previousHeartbeat.status === PENDING &&
+            nextStatus === DOWN &&
+            previousHeartbeat.retries < maxretries
+        ) {
             bean.retries = previousHeartbeat.retries + 1;
             bean.status = PENDING;
         } else {
@@ -528,7 +532,9 @@ router.post("/api/poller/register", async (request, response) => {
         pollerBean.region = payload.region || "local";
         pollerBean.datacenter = payload.datacenter || "";
         const capabilities =
-            typeof payload.capabilities === "string" ? payload.capabilities : JSON.stringify(payload.capabilities || {});
+            typeof payload.capabilities === "string"
+                ? payload.capabilities
+                : JSON.stringify(payload.capabilities || {});
         pollerBean.capabilities = capabilities;
         pollerBean.version = payload.version || "";
         pollerBean.status = "offline";

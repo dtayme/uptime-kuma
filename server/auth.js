@@ -131,7 +131,10 @@ function userAuthorizer(req, username, password, callback) {
                     callback(null, user != null);
 
                     if (user == null) {
-                        log.warn("basic-auth", `Failed basic auth attempt: invalid username/password (${rateLimitKey})`);
+                        log.warn(
+                            "basic-auth",
+                            `Failed basic auth attempt: invalid username/password (${rateLimitKey})`
+                        );
                         loginRateLimiter.removeTokens(rateLimitKey, 1);
                     }
                 });

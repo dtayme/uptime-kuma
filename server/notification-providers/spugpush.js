@@ -35,4 +35,3 @@ class SpugPush extends NotificationProvider {
 }
 
 module.exports = SpugPush;
-

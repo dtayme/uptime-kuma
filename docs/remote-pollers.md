@@ -16,6 +16,7 @@ This document captures the phased plan to add support for multiple remote poller
 ## Step 2: Control Plane
 
 Status:
+
 - [x] Poller registry tables (`poller`, `poller_token`)
 - [x] Monitor assignment columns (`poller_mode`, `poller_id`, `poller_region`, `poller_datacenter`, `poller_capability`)
 - [x] Control plane API endpoints (`/api/poller/register`, `/api/poller/heartbeat`, `/api/poller/assignments`, `/api/poller/results`)
@@ -23,6 +24,7 @@ Status:
 ### Poller Registry (DB)
 
 Table: `poller`
+
 - `id` (uuid, PK)
 - `name` (string)
 - `region` (string)
@@ -34,6 +36,7 @@ Table: `poller`
 - `created_at`, `updated_at`
 
 Table: `poller_token`
+
 - `id` (uuid, PK)
 - `poller_id` (fk)
 - `hashed_token` (string)
@@ -43,6 +46,7 @@ Table: `poller_token`
 ### Monitor Assignment
 
 Extend `monitor`:
+
 - `poller_mode` (`auto`, `pinned`, `grouped`)
 - `poller_id` (nullable, FK)
 - `poller_region` (nullable)
@@ -78,6 +82,7 @@ Extend `monitor`:
 ## Step 3: Data Plane
 
 Status:
+
 - [x] SQLite queue schema on poller
 - [x] Poller registration + token bootstrap
 - [x] Poller assignments pull + local cache
@@ -111,6 +116,7 @@ Status:
 ### SQLite Queue (Poller)
 
 Table: `poller_queue`
+
 - `id` (integer PK)
 - `monitor_id`
 - `ts`
@@ -122,11 +128,13 @@ Table: `poller_queue`
 - `next_retry_at`
 
 Table: `poller_assignments`
+
 - `assignment_version`
 - `snapshot_json`
 - `updated_at`
 
 Table: `poller_state`
+
 - `last_upload_at`
 - `last_heartbeat_at`
 - `queue_depth`
@@ -151,6 +159,7 @@ Table: `poller_state`
 ## Step 4: UI + API Updates
 
 Status:
+
 - [x] Poller settings panel (list + status)
 - [x] Registration token support (env or settings)
 - [ ] Advanced filters/management UX (region/datacenter filters, rotate/revoke tokens)

@@ -77,4 +77,3 @@ class HaloPSA extends NotificationProvider {
 }
 
 module.exports = HaloPSA;
-

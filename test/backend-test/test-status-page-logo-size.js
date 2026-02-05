@@ -103,7 +103,9 @@ stubModule(path.join(repoRoot, "server", "database.js"), stubDatabase);
 stubModule(path.join(repoRoot, "server", "image-data-uri.js"), stubImageDataURI);
 stubModule(path.join(repoRoot, "server", "modules", "apicache.js"), { clear() {} });
 
-const { statusPageSocketHandler } = require(path.join(repoRoot, "server", "socket-handlers", "status-page-socket-handler.js"));
+const { statusPageSocketHandler } = require(
+    path.join(repoRoot, "server", "socket-handlers", "status-page-socket-handler.js")
+);
 
 /**
  * Create a lightweight socket stub for status page handlers.

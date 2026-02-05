@@ -65,4 +65,3 @@ class RocketChat extends NotificationProvider {
 }
 
 module.exports = RocketChat;
-

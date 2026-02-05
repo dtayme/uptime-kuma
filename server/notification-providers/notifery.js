@@ -52,4 +52,3 @@ class Notifery extends NotificationProvider {
 }
 
 module.exports = Notifery;
-

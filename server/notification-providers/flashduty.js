@@ -115,4 +115,3 @@ class FlashDuty extends NotificationProvider {
 }
 
 module.exports = FlashDuty;
-

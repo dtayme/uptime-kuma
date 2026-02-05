@@ -111,4 +111,3 @@ class Splunk extends NotificationProvider {
 }
 
 module.exports = Splunk;
-

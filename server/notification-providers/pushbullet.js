@@ -57,4 +57,3 @@ class Pushbullet extends NotificationProvider {
 }
 
 module.exports = Pushbullet;
-

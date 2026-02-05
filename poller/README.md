@@ -44,6 +44,7 @@ docker run --rm \
 ```
 
 Optional environment variables:
+
 - `POLLER_SERVER_URL` (default: `http://localhost:3001`)
 - `POLLER_ID`
 - `POLLER_TOKEN`
@@ -101,6 +102,7 @@ docker run --rm \
 ```
 
 Notes:
+
 - You can also set the registration token in Settings -> Pollers instead of the env var.
 - If you are running central and poller in the same Docker network, use the service name for `POLLER_SERVER_URL`.
 - Registration tokens expire (default: 60 minutes). Regenerate a new token if the poller cannot register.
@@ -131,6 +133,7 @@ allows ICMP checks to run without full root, but it still expands the network‑
 rootless container, raw sockets can be abused for scanning or crafted traffic within the container network.
 
 Options to address this:
+
 - Prefer TCP/HTTP checks when possible (no extra privileges required).
 - Use a small sidecar ping proxy with `CAP_NET_RAW` and keep the poller container unprivileged.
 - If you must allow ICMP directly, add only `CAP_NET_RAW`, keep the filesystem read‑only, and drop all other caps.

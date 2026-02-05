@@ -66,4 +66,3 @@ class LunaSea extends NotificationProvider {
 }
 
 module.exports = LunaSea;
-

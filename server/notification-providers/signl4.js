@@ -51,4 +51,3 @@ class SIGNL4 extends NotificationProvider {
 }
 
 module.exports = SIGNL4;
-

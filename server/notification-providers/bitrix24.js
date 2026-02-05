@@ -29,4 +29,3 @@ class Bitrix24 extends NotificationProvider {
 }
 
 module.exports = Bitrix24;
-

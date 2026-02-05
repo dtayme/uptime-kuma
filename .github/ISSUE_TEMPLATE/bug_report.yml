@@ -150,4 +150,3 @@ body:
       render: bash session
     validations:
       required: false
-

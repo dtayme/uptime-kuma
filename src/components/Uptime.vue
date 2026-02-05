@@ -101,4 +101,3 @@ export default {
     min-width: 62px;
 }
 </style>
-

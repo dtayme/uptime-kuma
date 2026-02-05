@@ -138,4 +138,3 @@ class GoogleChat extends NotificationProvider {
 }
 
 module.exports = GoogleChat;
-

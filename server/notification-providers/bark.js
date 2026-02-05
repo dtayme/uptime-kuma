@@ -126,5 +126,3 @@ class Bark extends NotificationProvider {
 }
 
 module.exports = Bark;
-
-

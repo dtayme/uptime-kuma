@@ -55,4 +55,3 @@ class PushDeer extends NotificationProvider {
 }
 
 module.exports = PushDeer;
-

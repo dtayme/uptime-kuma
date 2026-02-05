@@ -66,4 +66,3 @@ function download(url) {
         }
     });
 }
-

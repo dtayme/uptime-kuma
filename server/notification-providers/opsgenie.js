@@ -95,4 +95,3 @@ class Opsgenie extends NotificationProvider {
 }
 
 module.exports = Opsgenie;
-

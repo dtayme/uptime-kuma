@@ -11,22 +11,26 @@
                 <button class="btn btn-primary" type="button" :disabled="processing" @click="generateToken">
                     Generate / Rotate
                 </button>
-                <button class="btn btn-secondary" type="button" @click="refresh">
-                    Refresh
-                </button>
+                <button class="btn btn-secondary" type="button" @click="refresh">Refresh</button>
             </div>
             <div class="form-text mt-2">
-                Provide this token in the <code>X-Poller-Registration-Token</code> header when calling
-                <code>POST /api/poller/register</code>.
+                Provide this token in the
+                <code>X-Poller-Registration-Token</code>
+                header when calling
+                <code>POST /api/poller/register</code>
+                .
                 <span v-if="registrationTokenExpiresAt">
                     <br />
-                    Expires at: <code>{{ registrationTokenExpiresAt }}</code>
+                    Expires at:
+                    <code>{{ registrationTokenExpiresAt }}</code>
                 </span>
             </div>
         </div>
 
         <div v-if="rotatedToken" class="alert alert-success">
-            New poller token for <strong>{{ rotatedPollerName }}</strong>:
+            New poller token for
+            <strong>{{ rotatedPollerName }}</strong>
+            :
             <CopyableInput v-model="rotatedToken" :disabled="true" class="mt-2" />
         </div>
 
@@ -42,17 +46,10 @@
                         placeholder="60"
                     />
                 </div>
-                <button
-                    class="btn btn-primary"
-                    type="button"
-                    :disabled="dnsCacheSaving"
-                    @click="saveDnsCacheSettings"
-                >
+                <button class="btn btn-primary" type="button" :disabled="dnsCacheSaving" @click="saveDnsCacheSettings">
                     Save
                 </button>
-                <button class="btn btn-secondary" type="button" @click="loadDnsCacheSettings">
-                    Refresh
-                </button>
+                <button class="btn btn-secondary" type="button" @click="loadDnsCacheSettings">Refresh</button>
             </div>
             <div class="form-text mt-2">
                 Set to 0 to disable poller DNS caching. Per-monitor opt-out is available in the monitor editor.
@@ -95,15 +92,11 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <button class="btn btn-outline-secondary w-100" type="button" @click="clearFilters">
-                    Clear
-                </button>
+                <button class="btn btn-outline-secondary w-100" type="button" @click="clearFilters">Clear</button>
             </div>
         </div>
 
-        <div v-if="filteredPollers.length === 0" class="text-muted">
-            No pollers registered.
-        </div>
+        <div v-if="filteredPollers.length === 0" class="text-muted">No pollers registered.</div>
 
         <div v-else class="table-responsive">
             <table class="table table-striped">
@@ -162,9 +155,7 @@
                                             min="1"
                                             class="form-control form-control-sm"
                                         />
-                                        <div class="form-text">
-                                            Higher weights receive more auto assignments.
-                                        </div>
+                                        <div class="form-text">Higher weights receive more auto assignments.</div>
                                     </div>
                                     <div class="col-lg-9">
                                         <label class="form-label">Capabilities</label>
@@ -426,7 +417,9 @@ export default {
         },
         normalizeCapabilities(capabilities) {
             const current =
-                capabilities && typeof capabilities === "object" && !Array.isArray(capabilities) ? { ...capabilities } : {};
+                capabilities && typeof capabilities === "object" && !Array.isArray(capabilities)
+                    ? { ...capabilities }
+                    : {};
             for (const option of this.capabilityOptions) {
                 current[option.value] = Boolean(current[option.value]);
             }

@@ -229,9 +229,12 @@ setInterval(() => {
     refreshAssignments();
 }, config.assignmentsIntervalMs);
 
-setInterval(() => {
-    maintenance();
-}, Math.max(config.uploadIntervalMs, 10000));
+setInterval(
+    () => {
+        maintenance();
+    },
+    Math.max(config.uploadIntervalMs, 10000)
+);
 
 scheduler.start(config.schedulerIntervalMs);
 

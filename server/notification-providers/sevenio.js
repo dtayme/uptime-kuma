@@ -57,4 +57,3 @@ class SevenIO extends NotificationProvider {
 }
 
 module.exports = SevenIO;
-

@@ -16,9 +16,7 @@
                 </a>
             </div>
 
-            <div class="mt-2 text-muted">
-                Forked from Uptime Kuma by Louis Lam.
-            </div>
+            <div class="mt-2 text-muted">Forked from Uptime Kuma by Louis Lam.</div>
 
             <div class="mt-1">
                 <div class="form-check">
@@ -90,4 +88,3 @@ export default {
     }
 }
 </style>
-

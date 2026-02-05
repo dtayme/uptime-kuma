@@ -28,4 +28,3 @@ jobs:
         with:
           dirtyLabel: "needs:resolve-merge-conflict"
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
-

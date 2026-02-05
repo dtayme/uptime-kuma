@@ -221,4 +221,3 @@ class Slack extends NotificationProvider {
 }
 
 module.exports = Slack;
-

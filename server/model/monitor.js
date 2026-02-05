@@ -2136,5 +2136,3 @@ class Monitor extends BeanModel {
 }
 
 module.exports = Monitor;
-
-

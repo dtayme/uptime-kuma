@@ -234,5 +234,3 @@ class Teams extends NotificationProvider {
 }
 
 module.exports = Teams;
-
-

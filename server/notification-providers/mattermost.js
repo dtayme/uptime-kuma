@@ -101,4 +101,3 @@ class Mattermost extends NotificationProvider {
 }
 
 module.exports = Mattermost;
-

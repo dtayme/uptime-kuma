@@ -112,4 +112,3 @@ class PagerDuty extends NotificationProvider {
 }
 
 module.exports = PagerDuty;
-

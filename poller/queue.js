@@ -75,12 +75,16 @@ function enqueueResult(db, record) {
  * @returns {object[]} Queue rows
  */
 function dequeueBatch(db, limit) {
-    return db.prepare(`
+    return db
+        .prepare(
+            `
         SELECT * FROM poller_queue
         WHERE next_retry_at IS NULL OR next_retry_at <= @now
         ORDER BY ts ASC
         LIMIT @limit
-    `).all({ now: Date.now(), limit });
+    `
+        )
+        .all({ now: Date.now(), limit });
 }
 
 /**
@@ -107,11 +111,7 @@ function markDelivered(db, ids) {
  * @returns {void}
  */
 function updateRetry(db, id, attempts, nextRetryAt) {
-    db.prepare("UPDATE poller_queue SET attempts = ?, next_retry_at = ? WHERE id = ?").run(
-        attempts,
-        nextRetryAt,
-        id
-    );
+    db.prepare("UPDATE poller_queue SET attempts = ?, next_retry_at = ? WHERE id = ?").run(attempts, nextRetryAt, id);
 }
 
 /**

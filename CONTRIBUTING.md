@@ -565,6 +565,3 @@ We have a few procedures we follow. These are documented here:
 
   </p>
   </details>
-
-
-

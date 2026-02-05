@@ -47,4 +47,3 @@ class Pumble extends NotificationProvider {
 }
 
 module.exports = Pumble;
-

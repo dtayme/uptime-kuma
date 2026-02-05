@@ -42,4 +42,3 @@ class Resend extends NotificationProvider {
 }
 
 module.exports = Resend;
-

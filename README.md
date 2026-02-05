@@ -25,16 +25,11 @@ Uptime Kuma Distributed is an easy-to-use self-hosted monitoring tool, forked fr
 - Proxy support
 - 2FA support
 
-
-
-
 - [GitHub Issues](https://github.com/dtayme/uptime-kuma-distributed/issues)
 
 For upstream project discussions, see the Uptime Kuma subreddit.
+
 - [Subreddit (r/UptimeKuma)](https://www.reddit.com/r/UptimeKuma/)
-
-
-
 
 ### Test Beta Version
 
@@ -63,7 +58,3 @@ If you want to translate Uptime Kuma Distributed into your language, please visi
 ### Spelling & Grammar
 
 Feel free to correct the grammar in the documentation or code.
-
-
-
-

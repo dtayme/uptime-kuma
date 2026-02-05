@@ -96,4 +96,3 @@ class PagerTree extends NotificationProvider {
 }
 
 module.exports = PagerTree;
-

@@ -237,20 +237,12 @@ async function resolveWithSystemLookup(hostname, family) {
 async function resolveWithCustomResolver(hostname, family) {
     const tasks = [];
     if (family === 6) {
-        tasks.push(
-            pollerResolver.resolve6(hostname, { ttl: true }).then((records) => ({ records, family: 6 }))
-        );
+        tasks.push(pollerResolver.resolve6(hostname, { ttl: true }).then((records) => ({ records, family: 6 })));
     } else if (family === 4) {
-        tasks.push(
-            pollerResolver.resolve4(hostname, { ttl: true }).then((records) => ({ records, family: 4 }))
-        );
+        tasks.push(pollerResolver.resolve4(hostname, { ttl: true }).then((records) => ({ records, family: 4 })));
     } else {
-        tasks.push(
-            pollerResolver.resolve4(hostname, { ttl: true }).then((records) => ({ records, family: 4 }))
-        );
-        tasks.push(
-            pollerResolver.resolve6(hostname, { ttl: true }).then((records) => ({ records, family: 6 }))
-        );
+        tasks.push(pollerResolver.resolve4(hostname, { ttl: true }).then((records) => ({ records, family: 4 })));
+        tasks.push(pollerResolver.resolve6(hostname, { ttl: true }).then((records) => ({ records, family: 6 })));
     }
 
     const settled = await Promise.allSettled(tasks);
@@ -489,7 +481,9 @@ async function checkHttp(assignment) {
     const headers = config.headers ? safeJsonParse(config.headers, {}) : {};
     const method = config.method || "GET";
     const body = config.body || undefined;
-    const acceptedStatuscodes = normalizeAcceptedStatuscodes(config.accepted_statuscodes || config.accepted_statuscodes_json);
+    const acceptedStatuscodes = normalizeAcceptedStatuscodes(
+        config.accepted_statuscodes || config.accepted_statuscodes_json
+    );
 
     const lookup = createPollerLookup(config);
     const httpsAgent = new https.Agent({ rejectUnauthorized: !config.ignoreTls, lookup });
@@ -665,7 +659,10 @@ async function checkDns(assignment) {
     const resolver = new Resolver();
     const type = config.dns_resolve_type || "A";
     const servers = config.dns_resolve_server
-        ? config.dns_resolve_server.split(",").map((s) => s.trim()).filter(Boolean)
+        ? config.dns_resolve_server
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
         : [];
     if (servers.length) {
         resolver.setServers(servers);
