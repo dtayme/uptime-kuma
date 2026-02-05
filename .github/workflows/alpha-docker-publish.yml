@@ -25,6 +25,8 @@ jobs:
             VERSION=$(node -p "require('./package.json').version")
             echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
           fi
+          DOCKER_VERSION="${VERSION//+/-}"
+          echo "DOCKER_VERSION=${DOCKER_VERSION}" >> "$GITHUB_ENV"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
@@ -45,7 +47,7 @@ jobs:
           --platform linux/amd64,linux/arm64,linux/arm/v7
           --target release
           -t fognetx/uptime-kuma-distributed:alpha
-          -t fognetx/uptime-kuma-distributed:${VERSION}
+          -t fognetx/uptime-kuma-distributed:${DOCKER_VERSION}
           .
           --push
 
@@ -56,6 +58,6 @@ jobs:
           --platform linux/amd64,linux/arm64,linux/arm/v7
           --target poller
           -t fognetx/uptime-kuma-distributed:poller-alpha
-          -t fognetx/uptime-kuma-distributed:poller-${VERSION}
+          -t fognetx/uptime-kuma-distributed:poller-${DOCKER_VERSION}
           .
           --push
