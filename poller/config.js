@@ -34,6 +34,22 @@ function parseJson(value, fallback) {
 }
 
 /**
+ * Parse a comma-delimited list.
+ * @param {string|null|undefined} value List value
+ * @returns {string[]} Parsed list
+ */
+function parseList(value) {
+    if (!value) {
+        return [];
+    }
+
+    return value
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+}
+
+/**
  * Load poller configuration from environment variables.
  * @returns {object} Poller configuration object
  */
@@ -47,6 +63,7 @@ function loadConfig() {
         datacenter: process.env.POLLER_DATACENTER || "",
         capabilities: parseJson(process.env.POLLER_CAPABILITIES_JSON, {}),
         dbPath: process.env.POLLER_DB_PATH || path.resolve(process.cwd(), "poller-data", "poller.sqlite"),
+        dnsServers: parseList(process.env.POLLER_DNS_SERVERS),
         heartbeatIntervalMs: parseNumber(process.env.POLLER_HEARTBEAT_INTERVAL_SECONDS, 15) * 1000,
         assignmentsIntervalMs: parseNumber(process.env.POLLER_ASSIGNMENTS_INTERVAL_SECONDS, 30) * 1000,
         uploadIntervalMs: parseNumber(process.env.POLLER_UPLOAD_INTERVAL_SECONDS, 10) * 1000,

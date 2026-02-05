@@ -82,6 +82,7 @@ Status:
 - [x] Poller registration + token bootstrap
 - [x] Poller assignments pull + local cache
 - [x] Batch result upload and heartbeat ingestion
+- [x] Poller DNS cache (max TTL + per-monitor opt-out)
 - [ ] Access token refresh / rotation
 - [ ] Optional mTLS support
 
@@ -102,6 +103,10 @@ Status:
 - Pull assignment on startup.
 - Run local scheduler based on assignment.
 - Queue results before upload.
+- Poller DNS cache honors a global max TTL (Settings -> Pollers).
+- Monitors can opt out of poller DNS cache when needed.
+- Poller DNS servers can be overridden via `POLLER_DNS_SERVERS` or Docker `--dns`.
+- Poller DNS cache can be shared via Redis (`POLLER_DNS_CACHE_REDIS_URL`).
 
 ### SQLite Queue (Poller)
 
@@ -163,6 +168,7 @@ Status:
 - Region/datacenter selection for grouped.
 - Poller selection for pinned.
 - Required capability selection.
+- Optional per-monitor poller DNS cache opt-out.
 
 ### Monitor Status
 

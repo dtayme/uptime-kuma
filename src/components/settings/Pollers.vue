@@ -26,6 +26,35 @@
             <CopyableInput v-model="rotatedToken" :disabled="true" class="mt-2" />
         </div>
 
+        <div class="mb-4">
+            <label class="form-label">Poller DNS Cache (Max TTL Seconds)</label>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <div class="flex-grow-1">
+                    <input
+                        v-model.number="dnsCacheMaxTtlSeconds"
+                        type="number"
+                        min="0"
+                        class="form-control"
+                        placeholder="60"
+                    />
+                </div>
+                <button
+                    class="btn btn-primary"
+                    type="button"
+                    :disabled="dnsCacheSaving"
+                    @click="saveDnsCacheSettings"
+                >
+                    Save
+                </button>
+                <button class="btn btn-secondary" type="button" @click="loadDnsCacheSettings">
+                    Refresh
+                </button>
+            </div>
+            <div class="form-text mt-2">
+                Set to 0 to disable poller DNS caching. Per-monitor opt-out is available in the monitor editor.
+            </div>
+        </div>
+
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h5 class="mb-0">Registered Pollers</h5>
         </div>
@@ -224,6 +253,8 @@ export default {
             rotatedToken: "",
             rotatedPollerName: "",
             processing: false,
+            dnsCacheMaxTtlSeconds: 60,
+            dnsCacheSaving: false,
             searchText: "",
             statusFilter: "",
             regionFilter: "",
@@ -287,6 +318,7 @@ export default {
     mounted() {
         this.refresh();
         this.loadToken();
+        this.loadDnsCacheSettings();
     },
     methods: {
         refresh() {
@@ -305,6 +337,31 @@ export default {
                 this.processing = false;
                 if (res.ok) {
                     this.registrationToken = res.token || "";
+                } else {
+                    this.$root.toastError(res.msg);
+                }
+            });
+        },
+        loadDnsCacheSettings() {
+            this.$root.getPollerDnsCacheSettings((res) => {
+                if (res.ok) {
+                    this.dnsCacheMaxTtlSeconds = res.maxTtlSeconds;
+                } else {
+                    this.$root.toastError(res.msg);
+                }
+            });
+        },
+        saveDnsCacheSettings() {
+            const parsed = Number.parseInt(this.dnsCacheMaxTtlSeconds, 10);
+            if (Number.isNaN(parsed) || parsed < 0) {
+                this.$root.toastError("Max TTL must be 0 or a positive integer.");
+                return;
+            }
+            this.dnsCacheSaving = true;
+            this.$root.setPollerDnsCacheSettings({ maxTtlSeconds: parsed }, (res) => {
+                this.dnsCacheSaving = false;
+                if (res.ok) {
+                    this.$root.toastSuccess("Poller DNS cache settings saved");
                 } else {
                     this.$root.toastError(res.msg);
                 }

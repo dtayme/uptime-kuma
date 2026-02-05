@@ -817,6 +817,7 @@ let needSetup = false;
                     bean.pollerRegion = monitor.pollerRegion;
                     bean.pollerDatacenter = monitor.pollerDatacenter;
                     bean.pollerCapability = monitor.pollerCapability;
+                    bean.pollerDnsCacheDisabled = monitor.pollerDnsCacheDisabled;
                 }
                 bean.user_id = socket.userID;
 
@@ -912,6 +913,7 @@ let needSetup = false;
                 bean.pollerRegion = monitor.pollerRegion;
                 bean.pollerDatacenter = monitor.pollerDatacenter;
                 bean.pollerCapability = monitor.pollerCapability;
+                bean.pollerDnsCacheDisabled = monitor.pollerDnsCacheDisabled;
                 bean.hostname = monitor.hostname;
                 bean.game = monitor.game;
                 bean.maxretries = monitor.maxretries;

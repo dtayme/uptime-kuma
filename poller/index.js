@@ -42,6 +42,12 @@ const scheduler = new Scheduler({
 log.info(`Poller scaffold starting (version ${appVersion})`);
 log.info(`Central URL: ${config.centralUrl}`);
 log.info(`Queue DB: ${config.dbPath}`);
+if (config.dnsServers && config.dnsServers.length) {
+    log.info(`DNS servers: ${config.dnsServers.join(", ")}`);
+}
+if (process.env.POLLER_DNS_CACHE_REDIS_URL) {
+    log.info("DNS cache: Redis enabled");
+}
 
 let isConfigured = Boolean(config.pollerId && config.accessToken);
 if (!isConfigured && config.registrationToken) {

@@ -52,6 +52,9 @@ Optional environment variables:
 - `POLLER_DATACENTER`
 - `POLLER_CAPABILITIES_JSON` (default: `{}`)
 - `POLLER_DB_PATH` (default: `./poller-data/poller.sqlite`)
+- `POLLER_DNS_SERVERS` (comma-delimited list of upstream DNS servers for poller lookups)
+- `POLLER_DNS_CACHE_REDIS_URL` (optional Redis URL to store DNS cache entries)
+- `POLLER_DNS_CACHE_REDIS_PREFIX` (optional Redis key prefix, default: `poller:dns-cache:`)
 - `POLLER_HEARTBEAT_INTERVAL_SECONDS` (default: `15`)
 - `POLLER_ASSIGNMENTS_INTERVAL_SECONDS` (default: `30`)
 - `POLLER_UPLOAD_INTERVAL_SECONDS` (default: `10`)
@@ -97,6 +100,25 @@ docker run --rm \
 Notes:
 - You can also set the registration token in Settings -> Pollers instead of the env var.
 - If you are running central and poller in the same Docker network, use the service name for `POLLER_SERVER_URL`.
+
+## DNS Settings
+
+- Poller DNS caching is controlled from Settings -> Pollers (max TTL seconds). Set to `0` to disable caching.
+- Each monitor can opt out of poller DNS caching in the monitor editor (useful for rapidly changing DNS records).
+- To override upstream DNS servers, set `POLLER_DNS_SERVERS` or configure Docker with `--dns`.
+- To share cache entries across pollers, set `POLLER_DNS_CACHE_REDIS_URL` so lookups are stored in Redis.
+
+Example with Docker DNS override:
+
+```bash
+docker run --rm \
+  --dns 1.1.1.1 \
+  --dns 8.8.8.8 \
+  -e POLLER_SERVER_URL=https://central.example.com \
+  -e POLLER_REGISTRATION_TOKEN=replace-with-registration-token \
+  -v poller-data:/app/poller-data \
+  fognetx/uptimekuma:poller
+```
 
 ## Notes
 

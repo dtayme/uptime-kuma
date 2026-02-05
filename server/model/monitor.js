@@ -172,6 +172,7 @@ class Monitor extends BeanModel {
             pollerRegion: this.pollerRegion ?? this.poller_region,
             pollerDatacenter: this.pollerDatacenter ?? this.poller_datacenter,
             pollerCapability: this.pollerCapability ?? this.poller_capability,
+            pollerDnsCacheDisabled: this.pollerDnsCacheDisabled ?? this.poller_dns_cache_disabled,
             docker_container: this.docker_container,
             docker_host: this.docker_host,
             proxyId: this.proxy_id,

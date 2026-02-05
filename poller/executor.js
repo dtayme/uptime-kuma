@@ -2,6 +2,8 @@ const axios = require("axios");
 const https = require("https");
 const http = require("http");
 const net = require("net");
+const dns = require("node:dns");
+const redis = require("redis");
 const { Resolver } = require("node:dns/promises");
 const ping = require("@louislam/ping");
 const dayjs = require("dayjs");
@@ -17,6 +19,376 @@ const { evaluateExpressionGroup } = require("../server/monitor-conditions/evalua
 const { UP, DOWN, evaluateJsonQuery } = require("../src/util");
 
 const acceptedStatusCodeDefault = ["200-299"];
+const pollerDnsServers = parseDnsServersEnv(process.env.POLLER_DNS_SERVERS);
+const pollerDnsServersKey = pollerDnsServers.length ? pollerDnsServers.join(",") : "system";
+const pollerDnsCacheRedisUrl = process.env.POLLER_DNS_CACHE_REDIS_URL || "";
+const pollerDnsCacheRedisPrefix = process.env.POLLER_DNS_CACHE_REDIS_PREFIX || "poller:dns-cache:";
+const pollerResolver = new Resolver();
+const dnsCache = new Map();
+const dnsPending = new Map();
+let redisClient;
+let redisConnecting;
+
+if (pollerDnsServers.length) {
+    pollerResolver.setServers(pollerDnsServers);
+}
+
+/**
+ * Parse DNS servers list from env.
+ * @param {string|undefined} value Comma-delimited servers
+ * @returns {string[]} Parsed server list
+ */
+function parseDnsServersEnv(value) {
+    if (!value) {
+        return [];
+    }
+    return value
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+}
+
+/**
+ * Normalize lookup options for dns.lookup-style callbacks.
+ * @param {object|number|function|undefined} options Lookup options or family
+ * @param {function|undefined} callback Callback
+ * @returns {{options: object, callback: function}} Normalized options and callback
+ */
+function normalizeLookupOptions(options, callback) {
+    let normalizedOptions = options;
+    let normalizedCallback = callback;
+
+    if (typeof normalizedOptions === "function") {
+        normalizedCallback = normalizedOptions;
+        normalizedOptions = {};
+    } else if (typeof normalizedOptions === "number") {
+        normalizedOptions = { family: normalizedOptions };
+    }
+
+    return {
+        options: normalizedOptions || {},
+        callback: normalizedCallback,
+    };
+}
+
+/**
+ * Build cache key for hostname lookup.
+ * @param {string} hostname Hostname
+ * @param {number} family Address family
+ * @returns {string} Cache key
+ */
+function buildDnsCacheKey(hostname, family) {
+    return `${pollerDnsServersKey}|${family || 0}|${hostname.toLowerCase()}`;
+}
+
+/**
+ * Build Redis cache key for hostname lookup.
+ * @param {string} hostname Hostname
+ * @param {number} family Address family
+ * @returns {string} Redis cache key
+ */
+function buildRedisCacheKey(hostname, family) {
+    return `${pollerDnsCacheRedisPrefix}${buildDnsCacheKey(hostname, family)}`;
+}
+
+/**
+ * Get or initialize Redis client.
+ * @returns {import("redis").RedisClientType|null} Redis client or null
+ */
+function getRedisClient() {
+    if (!pollerDnsCacheRedisUrl) {
+        return null;
+    }
+    if (!redisClient) {
+        redisClient = redis.createClient({ url: pollerDnsCacheRedisUrl });
+        redisClient.on("error", () => {});
+    }
+    return redisClient;
+}
+
+/**
+ * Ensure Redis is connected.
+ * @returns {Promise<import("redis").RedisClientType|null>} Connected client or null
+ */
+async function ensureRedisConnected() {
+    const client = getRedisClient();
+    if (!client) {
+        return null;
+    }
+    if (client.isOpen) {
+        return client;
+    }
+    if (!redisConnecting) {
+        redisConnecting = client.connect().catch(() => null);
+    }
+    await redisConnecting;
+    return client.isOpen ? client : null;
+}
+
+/**
+ * Try to read a cached DNS entry from Redis.
+ * @param {string} hostname Hostname
+ * @param {number} family Address family
+ * @returns {Promise<{addresses: {address:string,family:number}[], ttlSeconds: number}|null>}
+ */
+async function readRedisDnsCache(hostname, family) {
+    try {
+        const client = await ensureRedisConnected();
+        if (!client) {
+            return null;
+        }
+        const key = buildRedisCacheKey(hostname, family || 0);
+        const cachedValue = await client.get(key);
+        if (!cachedValue) {
+            return null;
+        }
+
+        let addresses;
+        try {
+            addresses = JSON.parse(cachedValue);
+        } catch {
+            return null;
+        }
+
+        if (!Array.isArray(addresses) || addresses.length === 0) {
+            return null;
+        }
+
+        const ttlSeconds = await client.ttl(key);
+        if (ttlSeconds <= 0) {
+            return null;
+        }
+
+        return {
+            addresses,
+            ttlSeconds,
+        };
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Write a DNS entry to Redis with TTL.
+ * @param {string} hostname Hostname
+ * @param {number} family Address family
+ * @param {object[]} addresses Resolved addresses
+ * @param {number} ttlSeconds TTL in seconds
+ * @returns {Promise<void>}
+ */
+async function writeRedisDnsCache(hostname, family, addresses, ttlSeconds) {
+    try {
+        const client = await ensureRedisConnected();
+        if (!client) {
+            return;
+        }
+        const key = buildRedisCacheKey(hostname, family || 0);
+        await client.set(key, JSON.stringify(addresses), { EX: ttlSeconds });
+    } catch {
+        return;
+    }
+}
+
+/**
+ * Determine whether to fallback to system lookup for local names.
+ * @param {string} hostname Hostname
+ * @returns {boolean} True if local/system lookup should be used
+ */
+function shouldUseSystemLookup(hostname) {
+    if (!hostname) {
+        return true;
+    }
+    if (hostname === "localhost") {
+        return true;
+    }
+    if (hostname.endsWith(".local")) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Resolve hostname using system DNS (dns.lookup).
+ * @param {string} hostname Hostname
+ * @param {number} family Address family (0,4,6)
+ * @returns {Promise<{addresses: {address:string,family:number}[], ttlSeconds: number|null}>}
+ */
+async function resolveWithSystemLookup(hostname, family) {
+    const results = await dns.promises.lookup(hostname, {
+        all: true,
+        family: family || 0,
+    });
+
+    return {
+        addresses: results.map((entry) => ({
+            address: entry.address,
+            family: entry.family,
+        })),
+        ttlSeconds: null,
+    };
+}
+
+/**
+ * Resolve hostname using a custom resolver (supports TTL).
+ * @param {string} hostname Hostname
+ * @param {number} family Address family (0,4,6)
+ * @returns {Promise<{addresses: {address:string,family:number}[], ttlSeconds: number|null}>}
+ */
+async function resolveWithCustomResolver(hostname, family) {
+    const tasks = [];
+    if (family === 6) {
+        tasks.push(
+            pollerResolver.resolve6(hostname, { ttl: true }).then((records) => ({ records, family: 6 }))
+        );
+    } else if (family === 4) {
+        tasks.push(
+            pollerResolver.resolve4(hostname, { ttl: true }).then((records) => ({ records, family: 4 }))
+        );
+    } else {
+        tasks.push(
+            pollerResolver.resolve4(hostname, { ttl: true }).then((records) => ({ records, family: 4 }))
+        );
+        tasks.push(
+            pollerResolver.resolve6(hostname, { ttl: true }).then((records) => ({ records, family: 6 }))
+        );
+    }
+
+    const settled = await Promise.allSettled(tasks);
+    const addresses = [];
+    const ttlValues = [];
+    let lastError;
+
+    for (const result of settled) {
+        if (result.status === "fulfilled") {
+            const { records, family: recordFamily } = result.value;
+            for (const record of records) {
+                addresses.push({
+                    address: record.address,
+                    family: recordFamily,
+                });
+                if (Number.isFinite(record.ttl)) {
+                    ttlValues.push(record.ttl);
+                }
+            }
+        } else {
+            lastError = result.reason;
+        }
+    }
+
+    if (!addresses.length) {
+        throw lastError || new Error(`DNS lookup failed for ${hostname}`);
+    }
+
+    return {
+        addresses,
+        ttlSeconds: ttlValues.length ? Math.min(...ttlValues) : null,
+    };
+}
+
+/**
+ * Resolve hostname with optional caching and custom DNS servers.
+ * @param {string} hostname Hostname
+ * @param {number} family Address family
+ * @param {number} maxTtlSeconds Max TTL in seconds
+ * @param {boolean} cacheDisabled Whether caching is disabled
+ * @returns {Promise<{address:string,family:number}[]>}
+ */
+async function resolveWithCache(hostname, family, maxTtlSeconds, cacheDisabled) {
+    if (!hostname) {
+        throw new Error("Hostname is required");
+    }
+
+    const ipFamily = net.isIP(hostname);
+    if (ipFamily) {
+        return [{ address: hostname, family: ipFamily }];
+    }
+
+    const useSystemLookup = shouldUseSystemLookup(hostname) || pollerDnsServers.length === 0;
+
+    if (cacheDisabled || maxTtlSeconds <= 0) {
+        const { addresses } = useSystemLookup
+            ? await resolveWithSystemLookup(hostname, family)
+            : await resolveWithCustomResolver(hostname, family);
+        return addresses;
+    }
+
+    const key = buildDnsCacheKey(hostname, family || 0);
+    const now = Date.now();
+    const existing = dnsCache.get(key);
+    if (existing && existing.expiresAt > now) {
+        return existing.addresses;
+    }
+
+    if (dnsPending.has(key)) {
+        return dnsPending.get(key);
+    }
+
+    const redisCached = await readRedisDnsCache(hostname, family);
+    if (redisCached) {
+        dnsCache.set(key, {
+            addresses: redisCached.addresses,
+            expiresAt: Date.now() + redisCached.ttlSeconds * 1000,
+        });
+        return redisCached.addresses;
+    }
+
+    const promise = (async () => {
+        const { addresses, ttlSeconds } = useSystemLookup
+            ? await resolveWithSystemLookup(hostname, family)
+            : await resolveWithCustomResolver(hostname, family);
+
+        const effectiveTtl = Math.max(
+            1,
+            Math.min(maxTtlSeconds, Number.isFinite(ttlSeconds) ? ttlSeconds : maxTtlSeconds)
+        );
+
+        dnsCache.set(key, {
+            addresses,
+            expiresAt: Date.now() + effectiveTtl * 1000,
+        });
+
+        await writeRedisDnsCache(hostname, family, addresses, effectiveTtl);
+
+        return addresses;
+    })();
+
+    dnsPending.set(key, promise);
+    try {
+        return await promise;
+    } finally {
+        dnsPending.delete(key);
+    }
+}
+
+/**
+ * Build a lookup function for poller checks.
+ * @param {object} config Monitor config
+ * @returns {(hostname: string, options: object, callback: function) => void}
+ */
+function createPollerLookup(config) {
+    const maxTtl = Number.parseInt(config.pollerDnsCacheMaxTtlSeconds, 10);
+    const maxTtlSeconds = Number.isFinite(maxTtl) ? maxTtl : 60;
+    const cacheDisabled = Boolean(config.pollerDnsCacheDisabled) || maxTtlSeconds <= 0;
+
+    return (hostname, options, callback) => {
+        const { options: lookupOptions, callback: lookupCallback } = normalizeLookupOptions(options, callback);
+        const family = Number.parseInt(lookupOptions.family || 0, 10) || 0;
+        const wantsAll = Boolean(lookupOptions.all);
+
+        resolveWithCache(hostname, family, maxTtlSeconds, cacheDisabled)
+            .then((addresses) => {
+                if (wantsAll) {
+                    lookupCallback(null, addresses);
+                } else {
+                    const first = addresses[0];
+                    lookupCallback(null, first.address, first.family);
+                }
+            })
+            .catch((error) => {
+                lookupCallback(error);
+            });
+    };
+}
 
 /**
  * Normalize accepted status code config.
@@ -119,8 +491,9 @@ async function checkHttp(assignment) {
     const body = config.body || undefined;
     const acceptedStatuscodes = normalizeAcceptedStatuscodes(config.accepted_statuscodes || config.accepted_statuscodes_json);
 
-    const httpsAgent = new https.Agent({ rejectUnauthorized: !config.ignoreTls });
-    const httpAgent = new http.Agent();
+    const lookup = createPollerLookup(config);
+    const httpsAgent = new https.Agent({ rejectUnauthorized: !config.ignoreTls, lookup });
+    const httpAgent = new http.Agent({ lookup });
 
     const start = dayjs().valueOf();
     const response = await axios.request({
@@ -257,6 +630,7 @@ function checkTcp(assignment) {
         const start = Date.now();
         const socket = new net.Socket();
         const timeoutMs = config.timeout ? config.timeout * 1000 : 10000;
+        const lookup = createPollerLookup(config);
 
         const onError = (error) => {
             socket.destroy();
@@ -269,7 +643,7 @@ function checkTcp(assignment) {
 
         socket.once("error", onError);
 
-        socket.connect(config.port, config.hostname, () => {
+        socket.connect({ port: config.port, host: config.hostname, lookup }, () => {
             const latencyMs = Date.now() - start;
             socket.end();
             resolve({
@@ -350,7 +724,7 @@ async function checkDns(assignment) {
  */
 function mqttReceive(hostname, topic, options = {}) {
     return new Promise((resolve, reject) => {
-        const { port, username, password, websocketPath, timeoutMs } = options;
+        const { port, username, password, websocketPath, timeoutMs, lookup } = options;
 
         if (!/^(?:http|mqtt|ws)s?:\/\//.test(hostname)) {
             hostname = `mqtt://${hostname}`;
@@ -377,6 +751,7 @@ function mqttReceive(hostname, topic, options = {}) {
             username,
             password,
             clientId: `uptime-kuma_${Math.random().toString(16).slice(2, 10)}`,
+            lookup,
         });
 
         client.on("connect", () => {
@@ -412,12 +787,14 @@ async function checkMqtt(assignment) {
     const { config } = assignment;
     const start = Date.now();
     const timeoutMs = Math.max(1000, (assignment.interval || 20) * 1000 * 0.8);
+    const lookup = createPollerLookup(config);
     const [messageTopic, receivedMessage] = await mqttReceive(config.hostname, config.mqttTopic, {
         port: config.port,
         username: config.mqttUsername,
         password: config.mqttPassword,
         websocketPath: config.mqttWebsocketPath,
         timeoutMs,
+        lookup,
     });
     const latencyMs = Date.now() - start;
 

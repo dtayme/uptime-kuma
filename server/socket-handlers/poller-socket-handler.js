@@ -7,6 +7,8 @@ const { sendPollerList } = require("../client");
 const { buildAssignmentsForPoller } = require("../poller/assignments");
 const { log, genSecret } = require("../../src/util");
 
+const DEFAULT_POLLER_DNS_CACHE_MAX_TTL_SECONDS = 60;
+
 /**
  * Hash a token using SHA-256.
  * @param {string} token Raw token
@@ -44,6 +46,46 @@ module.exports.pollerSocketHandler = (socket) => {
             callback({
                 ok: true,
                 token,
+            });
+        } catch (error) {
+            callback({
+                ok: false,
+                msg: error.message,
+            });
+        }
+    });
+
+    socket.on("getPollerDnsCacheSettings", async (callback) => {
+        try {
+            checkLogin(socket);
+            const rawMaxTtl = await Settings.get("pollerDnsCacheMaxTtlSeconds");
+            const parsedMaxTtl = Number.parseInt(rawMaxTtl, 10);
+            const maxTtlSeconds =
+                Number.isFinite(parsedMaxTtl) && parsedMaxTtl >= 0
+                    ? parsedMaxTtl
+                    : DEFAULT_POLLER_DNS_CACHE_MAX_TTL_SECONDS;
+            callback({
+                ok: true,
+                maxTtlSeconds,
+            });
+        } catch (error) {
+            callback({
+                ok: false,
+                msg: error.message,
+            });
+        }
+    });
+
+    socket.on("setPollerDnsCacheSettings", async (payload, callback) => {
+        try {
+            checkLogin(socket);
+            const parsedMaxTtl = Number.parseInt(payload?.maxTtlSeconds, 10);
+            if (!Number.isFinite(parsedMaxTtl) || parsedMaxTtl < 0) {
+                throw new Error("Max TTL must be 0 or a positive integer (seconds).");
+            }
+            await Settings.set("pollerDnsCacheMaxTtlSeconds", parsedMaxTtl);
+            callback({
+                ok: true,
             });
         } catch (error) {
             callback({

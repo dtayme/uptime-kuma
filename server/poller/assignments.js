@@ -1,5 +1,8 @@
 const crypto = require("crypto");
 const { R } = require("redbean-node");
+const { Settings } = require("../settings");
+
+const DEFAULT_POLLER_DNS_CACHE_MAX_TTL_SECONDS = 60;
 
 /**
  * Parse poller capabilities JSON.
@@ -101,7 +104,8 @@ function computeAssignmentVersion(assignments) {
  * @param {object} monitor Monitor record
  * @returns {object} Monitor configuration payload
  */
-function buildMonitorConfig(monitor) {
+function buildMonitorConfig(monitor, options = {}) {
+    const { pollerDnsCacheMaxTtlSeconds } = options;
     return {
         url: monitor.url,
         hostname: monitor.hostname,
@@ -150,6 +154,9 @@ function buildMonitorConfig(monitor) {
         snmpVersion: monitor.snmpVersion,
         snmp_v3_username: monitor.snmp_v3_username,
         conditions: monitor.conditions,
+        pollerDnsCacheDisabled: monitor.pollerDnsCacheDisabled ?? monitor.poller_dns_cache_disabled ?? false,
+        pollerDnsCacheMaxTtlSeconds:
+            pollerDnsCacheMaxTtlSeconds ?? DEFAULT_POLLER_DNS_CACHE_MAX_TTL_SECONDS,
     };
 }
 
@@ -168,6 +175,12 @@ function normalizePollerMode(mode) {
  * @returns {Promise<object[]>} Assignment list
  */
 async function buildAssignmentsForPoller(poller) {
+    const rawMaxTtl = await Settings.get("pollerDnsCacheMaxTtlSeconds");
+    const parsedMaxTtl = Number.parseInt(rawMaxTtl, 10);
+    const pollerDnsCacheMaxTtlSeconds =
+        Number.isFinite(parsedMaxTtl) && parsedMaxTtl >= 0
+            ? parsedMaxTtl
+            : DEFAULT_POLLER_DNS_CACHE_MAX_TTL_SECONDS;
     const pollers = await R.find("poller");
     const onlinePollers = pollers.filter((p) => p.status !== "offline");
     const pollerCaps = parseCapabilities(poller.capabilities);
@@ -227,7 +240,7 @@ async function buildAssignmentsForPoller(poller) {
             monitor_id: monitor.id,
             interval: monitor.interval,
             type: monitor.type,
-            config: buildMonitorConfig(monitor),
+            config: buildMonitorConfig(monitor, { pollerDnsCacheMaxTtlSeconds }),
         });
     }
 

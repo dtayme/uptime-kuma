@@ -172,6 +172,23 @@
                                 </select>
                             </div>
 
+                            <div v-if="monitor.pollerMode && monitor.pollerMode !== 'local'" class="my-3">
+                                <div class="form-check">
+                                    <input
+                                        id="poller-dns-cache-disabled"
+                                        v-model="monitor.pollerDnsCacheDisabled"
+                                        class="form-check-input"
+                                        type="checkbox"
+                                    />
+                                    <label class="form-check-label" for="poller-dns-cache-disabled">
+                                        Disable poller DNS cache for this monitor
+                                    </label>
+                                </div>
+                                <div class="form-text">
+                                    Use this for targets with frequently changing DNS records.
+                                </div>
+                            </div>
+
                             <!-- Manual Status switcher -->
                             <div v-if="monitor.type === 'manual'" class="mb-3">
                                 <div class="btn-group w-100 mb-3">
@@ -2886,6 +2903,7 @@ const monitorDefaults = {
     pollerRegion: "",
     pollerDatacenter: "",
     pollerCapability: "",
+    pollerDnsCacheDisabled: false,
 };
 
 export default {

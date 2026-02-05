@@ -667,6 +667,14 @@ export default {
             socket.emit("generatePollerRegistrationToken", callback);
         },
 
+        getPollerDnsCacheSettings(callback) {
+            socket.emit("getPollerDnsCacheSettings", callback);
+        },
+
+        setPollerDnsCacheSettings(payload, callback) {
+            socket.emit("setPollerDnsCacheSettings", payload, callback);
+        },
+
         rotatePollerToken(pollerId, callback) {
             socket.emit("rotatePollerToken", pollerId, callback);
         },
