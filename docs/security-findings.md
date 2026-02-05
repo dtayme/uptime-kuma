@@ -49,9 +49,11 @@ Notes:
 - Status page logo uploads now enforce a configurable max size for data URI PNGs (default 1MB).
 
 **Finding 7 (Low): Missing CSP/Referrer-Policy/Permissions-Policy headers**
-Status: Open
+Status: Mitigated
 Scope: `server/server.js`
 Recommendation: add `helmet` with a tailored CSP and standard security headers.
+Notes:
+- Added Helmet with a tailored CSP plus Referrer-Policy and Permissions-Policy headers.
 
 **Finding 8 (Low): Rate limiting is global, not per IP/user**
 Status: Open
