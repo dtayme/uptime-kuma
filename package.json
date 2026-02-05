@@ -4,7 +4,7 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/dtayme/uptime-kuma.git"
+        "url": "https://github.com/dtayme/uptime-kuma-distributed.git"
     },
     "engines": {
         "node": ">= 20.4.0"
@@ -245,3 +245,6 @@
         "esbuild": "0.25.0"
     }
 }
+
+
+

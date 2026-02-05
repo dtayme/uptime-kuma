@@ -53,8 +53,8 @@ to review the appropriate one for your contribution.
   parts like the documentation.
   [**PLEASE SEE OUR SECURITY POLICY.**](SECURITY.md)
 
-  [advisory]: https://github.com/louislam/uptime-kuma/security/advisories/new
-  [issue]: https://github.com/dtayme/uptime-kuma/issues/new?template=security_issue.yml
+  [advisory]: https://github.com/dtayme/uptime-kuma-distributed/security/advisories/new
+  [issue]: https://github.com/dtayme/uptime-kuma-distributed/issues/new?template=security_issue.yml
 
   </p>
   </details>
@@ -79,12 +79,12 @@ to review the appropriate one for your contribution.
 
   Please add **all** strings that are translatable to `src/lang/en.json`. If translation keys are omitted, they cannot be translated. **Do not include any other languages in your initial pull request** (even if it is your mother tongue) to avoid merge conflicts between Weblate and `master`. Once your PR is merged into `master`, the strings can be translated by awesome people donating their language skills.
 
-  We use Weblate to localise this project into many languages. If you want to help translate Uptime Kuma into your language, please see [these instructions on how to translate using Weblate](https://github.com/louislam/uptime-kuma/blob/master/src/lang/README.md).
+  We use Weblate to localise this project into many languages. If you want to help translate Uptime Kuma into your language, please see [these instructions on how to translate using Weblate](https://github.com/dtayme/uptime-kuma-distributed/blob/master/src/lang/README.md).
 
   There are some cases where a change cannot be done directly in Weblate and requires a PR:
   - A text may not yet be localisable. In this case, **adding a new language key** via `{{ $t("Translation key") }}` or [`<i18n-t keypath="Translation key">`](https://vue-i18n.intlify.dev/guide/advanced/component.html) might be necessary.
   - Language keys need to be **added to `en.json`** to appear in Weblate. If this has not been done, a PR is appreciated.
-  - **Adding a new language** requires creating a new file. See [these instructions](https://github.com/louislam/uptime-kuma/blob/master/src/lang/README.md).
+  - **Adding a new language** requires creating a new file. See [these instructions](https://github.com/dtayme/uptime-kuma-distributed/blob/master/src/lang/README.md).
 
   <sub>Because maintainer time is precious, junior maintainers may merge uncontroversial PRs in this area.</sub>
 
@@ -213,7 +213,7 @@ to review the appropriate one for your contribution.
   <p>
 
   Contributing is easy and fun. We will guide you through the process:
-  1. **Fork** the [Uptime-Kuma repository](https://github.com/louislam/uptime-kuma/) and **clone** it to your local machine.
+  1. **Fork** the [Uptime-Kuma repository](https://github.com/dtayme/uptime-kuma-distributed/) and **clone** it to your local machine.
   2. **Create a new branch** for your changes (e.g., `signal-notification-provider`).
   3. **Make your changes** and **commit** them with a clear message.
   4. **Push** your changes to your forked repository.
@@ -268,7 +268,7 @@ I ([@louislam](https://github.com/louislam)) have the final say.
 If your pull request does not meet my expectations, I will reject it, no matter how much time
 you spent on it.
 
-We will assign your pull request to a [milestone](https://github.com/louislam/uptime-kuma/milestones), if we plan to review and merge it.
+We will assign your pull request to a [milestone](https://github.com/dtayme/uptime-kuma-distributed/milestones), if we plan to review and merge it.
 
 Please don't rush or ask for an ETA.
 We have to understand the pull request, make sure it has no breaking changes and stick to the vision of this project, especially for large pull requests.
@@ -404,7 +404,7 @@ The data and socket logic are in `src/mixins/socket.js`.
 
 ## Database Migration
 
-See: <https://github.com/louislam/uptime-kuma/tree/master/db/knex_migrations>
+See: <https://github.com/dtayme/uptime-kuma-distributed/tree/master/db/knex_migrations>
 
 ## Unit Test
 
@@ -448,7 +448,7 @@ English is not the native language of the maintainers.
 Since there is no way to make a pull request to the wiki, I have set up another
 repo to do that.
 
-<https://github.com/louislam/uptime-kuma-wiki>
+<https://github.com/dtayme/uptime-kuma-distributed-wiki>
 
 ## Maintainer
 
@@ -515,7 +515,7 @@ We have a few procedures we follow. These are documented here:
 
   These Items need to be checked:
   - [ ] Check all tags is fine on
-        <https://hub.docker.com/r/louislam/uptime-kuma/tags>
+        <https://hub.docker.com/r/dtayme/uptime-kuma-distributed/tags>
   - [ ] Try the Docker image with tag 1.X.X (Clean install / amd64 / arm64 /
         armv7)
   - [ ] Try clean installation with Node.js
@@ -541,9 +541,9 @@ We have a few procedures we follow. These are documented here:
   **Setup Repo**
 
   ```bash
-  git clone https://github.com/louislam/uptime-kuma-wiki.git
+  git clone https://github.com/dtayme/uptime-kuma-distributed-wiki.git
   cd uptime-kuma-wiki
-  git remote add production https://github.com/louislam/uptime-kuma.wiki.git
+  git remote add production https://github.com/dtayme/uptime-kuma-distributed.wiki.git
   ```
 
   **Push to Production Wiki**
@@ -565,3 +565,6 @@ We have a few procedures we follow. These are documented here:
 
   </p>
   </details>
+
+
+

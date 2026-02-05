@@ -5,7 +5,7 @@
                 {{ $root.connectionErrorMsg }}
                 <div v-if="$root.showReverseProxyGuide">
                     {{ $t("Using a Reverse Proxy?") }}
-                    <a href="https://github.com/louislam/uptime-kuma/wiki/Reverse-Proxy" target="_blank">
+                    <a href="https://github.com/dtayme/uptime-kuma-distributed/wiki/Reverse-Proxy" target="_blank">
                         {{ $t("Check how to config it for WebSocket") }}
                     </a>
                 </div>
@@ -25,7 +25,7 @@
             <a
                 v-if="hasNewVersion"
                 target="_blank"
-                href="https://github.com/louislam/uptime-kuma/releases"
+                href="https://github.com/dtayme/uptime-kuma-distributed/releases"
                 class="btn btn-primary me-3"
             >
                 <font-awesome-icon icon="arrow-alt-circle-up" />
@@ -96,7 +96,7 @@
 
                             <li>
                                 <a
-                                    href="https://github.com/louislam/uptime-kuma/wiki"
+                                    href="https://github.com/dtayme/uptime-kuma-distributed/wiki"
                                     class="dropdown-item"
                                     target="_blank"
                                 >
@@ -434,3 +434,4 @@ main {
     }
 }
 </style>
+

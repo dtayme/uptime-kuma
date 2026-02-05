@@ -121,7 +121,7 @@ class Teams extends NotificationProvider {
                                                         type: "Image",
                                                         width: "32px",
                                                         style: "Person",
-                                                        url: "https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.png",
+                                                        url: "https://raw.githubusercontent.com/dtayme/uptime-kuma-distributed/master/public/icon.png",
                                                         altText: "Uptime Kuma Distributed Logo",
                                                     },
                                                 ],
@@ -234,4 +234,5 @@ class Teams extends NotificationProvider {
 }
 
 module.exports = Teams;
+
 

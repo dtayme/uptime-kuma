@@ -18,7 +18,7 @@ jobs:
   label:
     name: Labeling
     runs-on: ubuntu-latest
-    if: ${{ github.repository == 'louislam/uptime-kuma' }}
+    if: ${{ github.repository == 'dtayme/uptime-kuma-distributed' }}
     permissions:
       contents: read
       pull-requests: write
@@ -28,3 +28,4 @@ jobs:
         with:
           dirtyLabel: "needs:resolve-merge-conflict"
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
+

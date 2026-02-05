@@ -67,7 +67,7 @@ If the changes depend on certain environments or configurations, verify that the
 code has been tested in various environments (e.g., local development, staging,
 production).
 
-- [How to test Pull Requests](https://github.com/louislam/uptime-kuma/wiki/Test-Pull-Requests)
+- [How to test Pull Requests](https://github.com/dtayme/uptime-kuma-distributed/wiki/Test-Pull-Requests)
 
 ### Edge cases and regressions
 
@@ -222,3 +222,4 @@ may arise after the code has been merged.
 
 This process ensures that PRs are systematically and thoroughly reviewed,
 improving overall code quality.
+

@@ -29,7 +29,7 @@ RUN mkdir -p ./data
 FROM $BASE_IMAGE AS release
 WORKDIR /app
 
-LABEL org.opencontainers.image.source="https://github.com/dtayme/uptime-kuma"
+LABEL org.opencontainers.image.source="https://github.com/dtayme/uptime-kuma-distributed"
 
 ENV UPTIME_KUMA_IS_CONTAINER=1
 
@@ -78,7 +78,7 @@ RUN rm -rf ./* && chown node /app
 USER node
 RUN git config --global user.email "no-reply@no-reply.com"
 RUN git config --global user.name "PR Tester"
-RUN git clone https://github.com/dtayme/uptime-kuma.git .
+RUN git clone https://github.com/dtayme/uptime-kuma-distributed.git .
 
 # Hide the warning when running in detached head state
 RUN git config --global advice.detachedHead false
@@ -115,4 +115,5 @@ RUN chmod +x /app/extra/upload-github-release-asset.sh
 # Dist only
 RUN cd /app && tar -zcvf $DIST dist
 RUN /app/extra/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=dtayme repo=uptime-kuma tag=$VERSION filename=/app/$DIST
+
 

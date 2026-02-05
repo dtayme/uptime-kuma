@@ -100,7 +100,7 @@ export function buildImage(
  */
 export async function checkTagExists(repoNames, version) {
     // Skip if the tag is not on Docker Hub
-    // louislam/uptime-kuma
+    // dtayme/uptime-kuma-distributed
     let dockerHubRepoNames = repoNames.filter((name) => {
         return name.split("/").length === 2;
     });
@@ -314,8 +314,8 @@ export async function createReleasePR(version, previousVersion, dryRun, branchNa
     
     // Build the artifact link - use direct run link if available, otherwise link to workflow file
     const artifactLink = githubRunId 
-        ? `https://github.com/louislam/uptime-kuma/actions/runs/${githubRunId}/workflow`
-        : `https://github.com/louislam/uptime-kuma/actions/workflows/beta-release.yml`;
+        ? `https://github.com/dtayme/uptime-kuma-distributed/actions/runs/${githubRunId}/workflow`
+        : `https://github.com/dtayme/uptime-kuma-distributed/actions/workflows/beta-release.yml`;
     
     const body = `## Release ${version}
 
@@ -361,3 +361,4 @@ The \`dist.tar.gz\` archive will be available as an artifact in the workflow run
 
     console.log("Successfully created draft pull request");
 }
+

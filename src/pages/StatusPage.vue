@@ -570,7 +570,7 @@
 
                 <p v-if="config.showPoweredBy" data-testid="powered-by">
                     {{ $t("Powered by") }}
-                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/dtayme/uptime-kuma">
+                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/dtayme/uptime-kuma-distributed">
                         {{ appName }}
                     </a>
                 </p>
@@ -1785,3 +1785,4 @@ footer {
     }
 }
 </style>
+

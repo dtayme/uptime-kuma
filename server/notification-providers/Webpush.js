@@ -16,7 +16,7 @@ class Webpush extends NotificationProvider {
             const publicVapidKey = await setting("webpushPublicVapidKey");
             const privateVapidKey = await setting("webpushPrivateVapidKey");
 
-            webpush.setVapidDetails("https://github.com/louislam/uptime-kuma", publicVapidKey, privateVapidKey);
+            webpush.setVapidDetails("https://github.com/dtayme/uptime-kuma-distributed", publicVapidKey, privateVapidKey);
 
             if (heartbeatJSON === null && monitorJSON === null) {
                 // Test message
@@ -48,3 +48,4 @@ class Webpush extends NotificationProvider {
 }
 
 module.exports = Webpush;
+

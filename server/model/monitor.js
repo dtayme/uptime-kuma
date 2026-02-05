@@ -1155,7 +1155,7 @@ class Monitor extends BeanModel {
             } catch (e) {
                 console.trace(e);
                 UptimeKumaServer.errorLog(e, false);
-                log.error("monitor", "Please report to https://github.com/dtayme/uptime-kuma/issues");
+                log.error("monitor", "Please report to https://github.com/dtayme/uptime-kuma-distributed/issues");
 
                 if (!this.isStop) {
                     log.info("monitor", "Try to restart the monitor");
@@ -2135,3 +2135,5 @@ class Monitor extends BeanModel {
 }
 
 module.exports = Monitor;
+
+

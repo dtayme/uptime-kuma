@@ -21,7 +21,7 @@ function updateWiki(newVersion) {
 
     safeDelete(wikiDir);
 
-    childProcess.spawnSync("git", ["clone", "https://github.com/louislam/uptime-kuma.wiki.git", wikiDir]);
+    childProcess.spawnSync("git", ["clone", "https://github.com/dtayme/uptime-kuma-distributed.wiki.git", wikiDir]);
     let content = fs.readFileSync(howToUpdateFilename).toString();
 
     // Replace the version: https://regex101.com/r/hmj2Bc/1
@@ -56,3 +56,4 @@ function safeDelete(dir) {
         });
     }
 }
+
