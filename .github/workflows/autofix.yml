@@ -50,6 +50,9 @@ jobs:
         run: npm run fmt
         continue-on-error: true
 
+      - name: Discard .github changes
+        run: git restore --worktree --staged -- .github
+
       - name: Compile TypeScript
         run: npm run tsc
         continue-on-error: true
