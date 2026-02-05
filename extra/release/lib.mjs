@@ -33,7 +33,7 @@ export function getRepoNames() {
         // Split by comma
         return process.env.RELEASE_REPO_NAMES.split(",").map((name) => name.trim());
     }
-    return ["fognetx/uptimekuma"];
+    return ["fognetx/uptime-kuma-distributed"];
 }
 
 /**
@@ -193,7 +193,7 @@ export function ver(version, identifier) {
 
 /**
  * Upload artifacts to GitHub
- * docker buildx build -f docker/dockerfile --platform linux/amd64 -t fognetx/uptimekuma:upload-artifact --build-arg VERSION --build-arg GITHUB_TOKEN --target upload-artifact . --progress plain
+ * docker buildx build -f docker/dockerfile --platform linux/amd64 -t fognetx/uptime-kuma-distributed:upload-artifact --build-arg VERSION --build-arg GITHUB_TOKEN --target upload-artifact . --progress plain
  * @param {string} version Version
  * @param {string} githubToken GitHub token
  * @returns {void}
@@ -208,7 +208,7 @@ export function uploadArtifacts(version, githubToken) {
         "--platform",
         "linux/amd64",
         "-t",
-        "fognetx/uptimekuma:upload-artifact",
+        "fognetx/uptime-kuma-distributed:upload-artifact",
         "--build-arg",
         `VERSION=${version}`,
         "--build-arg",
@@ -361,4 +361,5 @@ The \`dist.tar.gz\` archive will be available as an artifact in the workflow run
 
     console.log("Successfully created draft pull request");
 }
+
 

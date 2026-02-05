@@ -31,6 +31,7 @@ jobs:
           docker buildx build
           -f docker/builder-go.dockerfile
           --platform linux/amd64,linux/arm64,linux/arm/v7
-          -t fognetx/uptimekuma:builder-go
+          -t fognetx/uptime-kuma-distributed:builder-go
           .
           --push
+

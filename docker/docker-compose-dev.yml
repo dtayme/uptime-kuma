@@ -3,7 +3,7 @@ version: "3.8"
 services:
   uptime-kuma:
     container_name: uptime-kuma-dev
-    image: fognetx/uptimekuma:nightly2
+    image: fognetx/uptime-kuma-distributed:nightly2
     volumes:
       #- ./data:/app/data
       - ../server:/app/server
@@ -11,3 +11,4 @@ services:
     ports:
       - "3001:3001" # <Host Port>:<Container Port>
       - "3307:3306"
+

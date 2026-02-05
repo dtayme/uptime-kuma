@@ -20,7 +20,8 @@ spawn("docker", [
     "-p", "3001:3001",
     "--pull", "always",
     "-e", `UPTIME_KUMA_GH_REPO=${prName}`,
-    "fognetx/uptimekuma:pr-test2"
+    "fognetx/uptime-kuma-distributed:pr-test2"
 ], {
     stdio: "inherit",
 });
+

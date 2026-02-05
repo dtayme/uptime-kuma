@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=fognetx/uptimekuma:base2
+ARG BASE_IMAGE=fognetx/uptime-kuma-distributed:base2
 
 ############################################
 # Build poller dependencies
@@ -33,3 +33,4 @@ COPY --chown=node:node --from=build /app /app
 VOLUME ["/app/poller-data"]
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["node", "poller/index.js"]
+

@@ -15,7 +15,7 @@ node poller/index.js
 Build the poller image:
 
 ```bash
-docker build -f docker/poller.dockerfile -t fognetx/uptimekuma:poller .
+docker build -f docker/poller.dockerfile -t fognetx/uptime-kuma-distributed:poller .
 ```
 
 Run the poller with registration (recommended for first start):
@@ -28,7 +28,7 @@ docker run --rm \
   -e POLLER_DATACENTER=dc-1 \
   -e POLLER_CAPABILITIES_JSON='{"http":true,"icmp":true,"tcp":true,"dns":true}' \
   -v poller-data:/app/poller-data \
-  fognetx/uptimekuma:poller
+  fognetx/uptime-kuma-distributed:poller
 ```
 
 Run the poller with an existing token:
@@ -40,7 +40,7 @@ docker run --rm \
   -e POLLER_TOKEN=replace-with-access-token \
   -e POLLER_REGION=us-east \
   -v poller-data:/app/poller-data \
-  fognetx/uptimekuma:poller
+  fognetx/uptime-kuma-distributed:poller
 ```
 
 Optional environment variables:
@@ -75,7 +75,7 @@ docker run --rm \
   -e POLLER_REGISTRATION_TOKEN=replace-with-registration-token \
   -p 3001:3001 \
   -v uptimekuma-data:/app/data \
-  fognetx/uptimekuma:nightly
+  fognetx/uptime-kuma-distributed:nightly
 ```
 
 2. Register the poller (first run) to receive `poller_id` and `access_token`.
@@ -86,7 +86,7 @@ docker run --rm \
   -e POLLER_REGISTRATION_TOKEN=replace-with-registration-token \
   -e POLLER_REGION=us-east \
   -v poller-data:/app/poller-data \
-  fognetx/uptimekuma:poller
+  fognetx/uptime-kuma-distributed:poller
 ```
 
 3. Run the poller using the returned credentials.
@@ -98,7 +98,7 @@ docker run --rm \
   -e POLLER_TOKEN=replace-with-access-token \
   -e POLLER_REGION=us-east \
   -v poller-data:/app/poller-data \
-  fognetx/uptimekuma:poller
+  fognetx/uptime-kuma-distributed:poller
 ```
 
 Notes:
@@ -123,7 +123,7 @@ docker run --rm \
   -e POLLER_SERVER_URL=https://central.example.com \
   -e POLLER_REGISTRATION_TOKEN=replace-with-registration-token \
   -v poller-data:/app/poller-data \
-  fognetx/uptimekuma:poller
+  fognetx/uptime-kuma-distributed:poller
 ```
 
 ## ICMP Ping Privileges
@@ -145,3 +145,4 @@ Options to address this:
   central APIs.
 - This is an initial scaffold to be expanded as the control plane and data plane
   APIs are implemented.
+

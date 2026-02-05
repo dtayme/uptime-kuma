@@ -1,9 +1,10 @@
 services:
   uptime-kuma:
-    image: fognetx/uptimekuma:2
+    image: fognetx/uptime-kuma-distributed:2
     restart: unless-stopped
     volumes:
       - ./data:/app/data
     ports:
       # <Host Port>:<Container Port>
       - "3001:3001"
+

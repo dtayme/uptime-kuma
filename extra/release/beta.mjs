@@ -62,14 +62,14 @@ if (!dryRun) {
         repoNames,
         ["beta-slim-rootless", ver(version, "slim-rootless")],
         "rootless",
-        "BASE_IMAGE=fognetx/uptimekuma:base2-slim"
+        "BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-slim"
     );
 
     // Build full image (rootless)
     buildImage(repoNames, ["beta-rootless", ver(version, "rootless")], "rootless");
 
     // Build slim image
-    buildImage(repoNames, ["beta-slim", ver(version, "slim")], "release", "BASE_IMAGE=fognetx/uptimekuma:base2-slim");
+    buildImage(repoNames, ["beta-slim", ver(version, "slim")], "release", "BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-slim");
 
     // Build full image
     buildImage(repoNames, ["beta", version], "release");
@@ -79,3 +79,4 @@ if (!dryRun) {
 
 // Create dist.tar.gz
 await createDistTarGz();
+

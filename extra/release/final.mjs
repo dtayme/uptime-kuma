@@ -40,13 +40,13 @@ execSync("node extra/update-version.js");
 buildDist();
 
 // Build slim image (rootless)
-buildImage(repoNames, [ "2-slim-rootless", ver(version, "slim-rootless") ], "rootless", "BASE_IMAGE=fognetx/uptimekuma:base2-slim");
+buildImage(repoNames, [ "2-slim-rootless", ver(version, "slim-rootless") ], "rootless", "BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-slim");
 
 // Build full image (rootless)
 buildImage(repoNames, [ "2-rootless", ver(version, "rootless") ], "rootless");
 
 // Build slim image
-buildImage(repoNames, [ "next-slim", "2-slim", ver(version, "slim") ], "release", "BASE_IMAGE=fognetx/uptimekuma:base2-slim");
+buildImage(repoNames, [ "next-slim", "2-slim", ver(version, "slim") ], "release", "BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-slim");
 
 // Build full image
 buildImage(repoNames, [ "next", "2", version ], "release");
@@ -58,3 +58,4 @@ uploadArtifacts(version, githubToken);
 
 // node extra/update-wiki-version.js
 execSync("node extra/update-wiki-version.js");
+

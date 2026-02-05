@@ -38,11 +38,11 @@
         "playwright-show-report": "playwright show-report ./private/playwright-report",
         "tsc": "tsc --project ./tsconfig-backend.json",
         "vite-preview-dist": "vite preview --host --config ./config/vite.config.js",
-        "build-docker-base": "docker buildx build -f docker/debian-base.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t fognetx/uptimekuma:base2 --target base2 . --push",
-        "build-docker-base-slim": "docker buildx build -f docker/debian-base.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t fognetx/uptimekuma:base2-slim --target base2-slim . --push",
-        "build-docker-builder-go": "docker buildx build -f docker/builder-go.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t fognetx/uptimekuma:builder-go . --push",
-        "build-docker-nightly-local": "npm run build && docker build -f docker/dockerfile -t fognetx/uptimekuma:nightly2 --target nightly .",
-        "build-docker-pr-test": "docker buildx build -f docker/dockerfile --platform linux/amd64,linux/arm64 -t fognetx/uptimekuma:pr-test2 --target pr-test2 . --push",
+        "build-docker-base": "docker buildx build -f docker/debian-base.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t fognetx/uptime-kuma-distributed:base2 --target base2 . --push",
+        "build-docker-base-slim": "docker buildx build -f docker/debian-base.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t fognetx/uptime-kuma-distributed:base2-slim --target base2-slim . --push",
+        "build-docker-builder-go": "docker buildx build -f docker/builder-go.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t fognetx/uptime-kuma-distributed:builder-go . --push",
+        "build-docker-nightly-local": "npm run build && docker build -f docker/dockerfile -t fognetx/uptime-kuma-distributed:nightly2 --target nightly .",
+        "build-docker-pr-test": "docker buildx build -f docker/dockerfile --platform linux/amd64,linux/arm64 -t fognetx/uptime-kuma-distributed:pr-test2 --target pr-test2 . --push",
         "upload-artifacts": "node extra/release/upload-artifacts.mjs",
         "upload-artifacts-beta": "node extra/release/upload-artifacts-beta.mjs",
         "setup": "git checkout 2.0.2 && npm ci --omit dev --no-audit && npm run download-dist",
@@ -65,7 +65,7 @@
         "build-healthcheck-armv7": "cross-env GOOS=linux GOARCH=arm GOARM=7 go build -x -o ./extra/healthcheck-armv7 ./extra/healthcheck.go",
         "deploy-demo-server": "node extra/deploy-demo-server.js",
         "sort-contributors": "node extra/sort-contributors.js",
-        "quick-run-nightly": "docker run --rm --env NODE_ENV=development -p 3001:3001 fognetx/uptimekuma:nightly2",
+        "quick-run-nightly": "docker run --rm --env NODE_ENV=development -p 3001:3001 fognetx/uptime-kuma-distributed:nightly2",
         "start-dev-container": "cd docker && docker-compose -f docker-compose-dev.yml up --force-recreate",
         "rebase-pr-to-1.23.X": "node extra/rebase-pr.js 1.23.X",
         "reset-migrate-aggregate-table-state": "node extra/reset-migrate-aggregate-table-state.js",
@@ -247,3 +247,4 @@
         "esbuild": "0.25.0"
     }
 }
+

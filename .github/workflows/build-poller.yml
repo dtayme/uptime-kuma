@@ -34,6 +34,7 @@ jobs:
           -f docker/poller.dockerfile
           --platform linux/amd64,linux/arm64,linux/arm/v7
           --target poller
-          -t fognetx/uptimekuma:poller-nightly
+          -t fognetx/uptime-kuma-distributed:poller-nightly
           .
           --push
+
