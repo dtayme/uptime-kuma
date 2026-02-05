@@ -13,6 +13,11 @@ Uptime Kuma Distributed is an easy-to-use self-hosted monitoring tool, forked fr
 
 ## ⭐ Features
 
+- Distributed monitoring with a central server and remote pollers for scale and network segmentation
+- Poller assignment modes per monitor: local, auto, grouped (region/datacenter), or pinned to a specific poller
+- Poller management controls: registration tokens with TTL, rotate/revoke tokens, per-poller weight and capabilities, assignment previews
+- Poller DNS cache with optional Redis backing and per-monitor opt-out for fast-changing records
+- Dedicated poller runtime and Docker image for remote execution
 - Monitoring uptime for HTTP(s) / TCP / HTTP(s) Keyword / HTTP(s) Json Query / Websocket / Ping / DNS Record / Push / Steam Game Server / Docker Containers
 - Fancy, Reactive, Fast UI/UX
 - Notifications via Telegram, Discord, Gotify, Slack, Pushover, Email (SMTP), and [90+ notification services, click here for the full list](https://github.com/dtayme/uptime-kuma-distributed/tree/master/src/components/notifications)
@@ -24,6 +29,10 @@ Uptime Kuma Distributed is an easy-to-use self-hosted monitoring tool, forked fr
 - Certificate info
 - Proxy support
 - 2FA support
+
+### Security Posture
+
+Uptime Kuma Distributed favors secure defaults and explicit controls. Healthchecks verify TLS by default, sensitive tokens can be rotated or revoked (including poller registration), and setup entry points are rate-limited. Code scanning is enabled with documented exceptions, and hardening notes are captured in the repository so operational decisions remain visible.
 
 - [GitHub Issues](https://github.com/dtayme/uptime-kuma-distributed/issues)
 
