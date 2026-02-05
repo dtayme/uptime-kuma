@@ -63,7 +63,6 @@ class User extends BeanModel {
         const parsed = Number.parseInt(tokenVersion, 10);
         return Number.isNaN(parsed) ? 0 : parsed;
     }
-
 }
 
 module.exports = User;

@@ -24,8 +24,8 @@ Rule ID: go/disabled-certificate-check
 Severity: High
 Location: extra/healthcheck.go:27-28 (main)
 Evidence:
-http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
-    InsecureSkipVerify: true,
+http.DefaultTransport.(\*http.Transport).TLSClientConfig = &tls.Config{
+InsecureSkipVerify: true,
 }
 Impact: Disables TLS certificate validation, enabling man-in-the-middle attacks on HTTPS checks.
 Fix: Build a custom `http.Transport` with `TLSClientConfig` that uses a CA pool populated from `UPTIME_KUMA_SSL_CERT` (self-signed cert supported) and keep `InsecureSkipVerify` false.
@@ -73,7 +73,7 @@ Severity: High
 Location: server/setup-database.js:169-299 (POST /setup-database)
 Evidence:
 const allowed = await setupRateLimiter.pass((err) => {
-    response.status(429).json(err);
+response.status(429).json(err);
 });
 Impact: CodeQL flags missing rate limiting on a DB setup endpoint that performs database access. If the limiter fails or is bypassed, it could be abused for DoS.
 Fix: Implement a dedicated Express middleware that wraps `setupRateLimiter` and attach it to the route, or adopt an established middleware like `express-rate-limit` for this endpoint.
