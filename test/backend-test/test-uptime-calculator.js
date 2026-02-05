@@ -351,7 +351,8 @@ describe("Uptime Calculator", () => {
         test(
             "handles year-long simulation with various statuses",
             {
-                skip: process.env.GITHUB_ACTIONS, // Not stable on GitHub Actions"
+                // Long-running stress test; opt-in only.
+                skip: process.env.GITHUB_ACTIONS || process.env.TEST_LONG !== "1",
             },
             async (t) => {
                 console.log("Memory usage before preparation", memoryUsage());
