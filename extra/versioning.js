@@ -44,7 +44,7 @@ function getCommitBuildMetadata(prefix = "distributed") {
         }
 
         return `${prefix}.${count}.${sha}`;
-    } catch (error) {
+    } catch {
         return null;
     }
 }
@@ -53,12 +53,13 @@ function getCommitBuildMetadata(prefix = "distributed") {
  * Build a release version string for a channel.
  * @param {object} options Options
  * @param {string} options.baseVersion Base semver (e.g. 2.1.0)
- * @param {string} [options.channel] Release channel (production|pre|alpha|beta)
- * @param {number|string} [options.channelNumber] Channel iteration number
- * @param {string} [options.buildMetadata] Optional build metadata suffix
- * @param {boolean} [options.includeCommitMetadata] Append git count+sha metadata
- * @param {string} [options.commitMetadataPrefix] Prefix for commit metadata
+ * @param {string} options.channel Release channel (production|pre|alpha|beta). Optional.
+ * @param {number|string} options.channelNumber Channel iteration number. Optional.
+ * @param {string} options.buildMetadata Build metadata suffix. Optional.
+ * @param {boolean} options.includeCommitMetadata Append git count+sha metadata. Optional.
+ * @param {string} options.commitMetadataPrefix Prefix for commit metadata. Optional.
  * @returns {string} Derived version
+ * @throws {Error} When baseVersion is missing or invalid
  */
 function buildChannelVersion({
     baseVersion,

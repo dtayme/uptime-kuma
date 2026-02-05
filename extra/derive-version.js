@@ -1,6 +1,12 @@
 const args = require("args-parser")(process.argv);
 const { buildChannelVersion } = require("./versioning");
 
+/**
+ * Read an environment variable with optional fallback.
+ * @param {string} name Variable name
+ * @param {string|undefined} fallback Fallback value
+ * @returns {string|undefined} Resolved value
+ */
 function getEnv(name, fallback = undefined) {
     return process.env[name] !== undefined ? process.env[name] : fallback;
 }
