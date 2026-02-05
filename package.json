@@ -57,6 +57,7 @@
         "simple-mariadb": "docker run --rm -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mariadb# mariadb",
         "update-language-files": "cd extra/update-language-files && node index.js && cross-env-shell eslint ../../src/languages/$npm_config_language.js --fix",
         "release-final": "node ./extra/release/final.mjs",
+        "release-alpha": "node ./extra/release/alpha.mjs",
         "release-beta": "node ./extra/release/beta.mjs",
         "release-nightly": "node ./extra/release/nightly.mjs",
         "git-remove-tag": "git tag -d",
