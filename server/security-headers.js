@@ -30,7 +30,7 @@ const buildHelmetConfig = (isDev) => {
 
 /**
  * Apply Permissions-Policy header (Helmet doesn't set it by default).
- * @returns {(req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => void}
+ * @returns {(req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => void} Express middleware that sets the Permissions-Policy header.
  */
 const permissionsPolicyMiddleware = () => (_req, res, next) => {
     res.setHeader("Permissions-Policy", PERMISSIONS_POLICY);
