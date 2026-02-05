@@ -6,6 +6,7 @@ package main
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -21,16 +22,7 @@ func main() {
 	// Is K8S + uptime-kuma as the container name
 	// See #2083
 	isK8s := strings.HasPrefix(os.Getenv("UPTIME_KUMA_PORT"), "tcp://")
-
-	// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-	// Local healthcheck may use self-signed certificates. lgtm [go/disabled-certificate-check]
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
-		InsecureSkipVerify: true,
-	}
-
-	client := http.Client{
-		Timeout: 28 * time.Second,
-	}
+	healthcheckInsecure := os.Getenv("UPTIME_KUMA_HEALTHCHECK_INSECURE") == "1"
 
 	sslKey := os.Getenv("UPTIME_KUMA_SSL_KEY")
 	if len(sslKey) == 0 {
@@ -67,6 +59,37 @@ func main() {
 		protocol = "https"
 	} else {
 		protocol = "http"
+	}
+
+	var transport *http.Transport
+	if protocol == "https" {
+		transport = http.DefaultTransport.(*http.Transport).Clone()
+		if healthcheckInsecure {
+			log.Println("Healthcheck TLS verification is disabled via UPTIME_KUMA_HEALTHCHECK_INSECURE=1")
+			transport.TLSClientConfig = &tls.Config{
+				InsecureSkipVerify: true,
+			}
+		} else if len(sslCert) != 0 {
+			certPem, err := os.ReadFile(sslCert)
+			if err != nil {
+				certPem = []byte(sslCert)
+			}
+			certPool := x509.NewCertPool()
+			if certPool.AppendCertsFromPEM(certPem) {
+				transport.TLSClientConfig = &tls.Config{
+					RootCAs: certPool,
+				}
+			} else {
+				log.Println("Healthcheck could not parse SSL cert for CA; using system roots")
+			}
+		}
+	}
+
+	client := http.Client{
+		Timeout: 28 * time.Second,
+	}
+	if transport != nil {
+		client.Transport = transport
 	}
 
 	url := protocol + "://" + hostname + ":" + port
