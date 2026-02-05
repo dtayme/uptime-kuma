@@ -43,6 +43,13 @@ Check out the latest beta release here: <https://github.com/dtayme/uptime-kuma-d
 
 If you want to report a bug or request a new feature, feel free to open a [new issue](https://github.com/dtayme/uptime-kuma-distributed/issues).
 
+### WebSocket Origin Check
+
+WebSocket connections validate the `Origin` header against the configured **Primary Base URL**.  
+You can add extra allowed origins in Settings -> General (comma-separated).  
+If you run behind a reverse proxy, ensure it forwards `X-Forwarded-Host` and enable `trustProxy` in settings.  
+If no base URL is configured, the server falls back to matching against the request host.
+
 ### Translations
 
 If you want to translate Uptime Kuma Distributed into your language, please visit [Weblate Readme](src/lang/README.md).

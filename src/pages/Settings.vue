@@ -171,6 +171,10 @@ export default {
                     this.settings.entryPage = "dashboard";
                 }
 
+                if (this.settings.webSocketAllowedOrigins === undefined) {
+                    this.settings.webSocketAllowedOrigins = "";
+                }
+
                 if (this.settings.keepDataPeriodDays === undefined) {
                     this.settings.keepDataPeriodDays = 180;
                 }

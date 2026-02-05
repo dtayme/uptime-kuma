@@ -163,32 +163,80 @@ class UptimeKumaServer {
                     if (bypass) {
                         log.info("auth", "WebSocket origin check is bypassed");
                         callback(null, true);
-                    } else if (!req.headers.origin) {
+                        return;
+                    }
+
+                    // Allow missing Origin (non-browser clients) as a safe fallback.
+                    if (!req.headers.origin) {
                         log.info("auth", "WebSocket with no origin is allowed");
                         callback(null, true);
-                    } else {
-                        let host = req.headers.host;
-                        let origin = req.headers.origin;
+                        return;
+                    }
 
-                        try {
-                            let originURL = new URL(origin);
-                            let xForwardedFor;
-                            if (await Settings.get("trustProxy")) {
-                                xForwardedFor = req.headers["x-forwarded-for"];
-                            }
+                    try {
+                        const origin = req.headers.origin;
+                        const originURL = new URL(origin);
+                        const originHost = originURL.host.toLowerCase();
 
-                            if (host !== originURL.host && xForwardedFor !== originURL.host) {
-                                callback(null, false);
-                                log.error("auth", `Origin (${origin}) does not match host (${host}), IP: ${clientIP}`);
-                            } else {
-                                callback(null, true);
+                        const allowlist = new Set();
+                        const addHosts = (value) => {
+                            if (!value) {
+                                return;
                             }
-                        } catch (e) {
-                            void e;
-                            // Invalid origin url, probably not from browser
-                            callback(null, false);
-                            log.error("auth", `Invalid origin url (${origin}), IP: ${clientIP}`);
+                            const entries = Array.isArray(value) ? value : String(value).split(",");
+                            for (const entry of entries) {
+                                let host = entry.trim().toLowerCase();
+                                if (!host) {
+                                    continue;
+                                }
+                                // Allow passing full origins (with scheme) or bare hosts.
+                                if (host.includes("://")) {
+                                    try {
+                                        host = new URL(host).host.toLowerCase();
+                                    } catch (error) {
+                                        void error;
+                                    }
+                                }
+                                if (host) {
+                                    allowlist.add(host);
+                                }
+                            }
+                        };
+
+                        // Prefer configured base URL when available.
+                        const primaryBaseURL = await Settings.get("primaryBaseURL");
+                        if (primaryBaseURL) {
+                            try {
+                                addHosts(new URL(primaryBaseURL).host);
+                            } catch (error) {
+                                void error;
+                            }
                         }
+
+                        // Additional configured WebSocket allowed origins/hosts.
+                        const extraOrigins = await Settings.get("webSocketAllowedOrigins");
+                        addHosts(extraOrigins);
+
+                        // Safe fallback for missing configuration: allow Host / X-Forwarded-Host matches.
+                        addHosts(req.headers.host);
+                        if (await Settings.get("trustProxy")) {
+                            addHosts(req.headers["x-forwarded-host"]);
+                        }
+
+                        if (allowlist.has(originHost)) {
+                            callback(null, true);
+                        } else {
+                            callback(null, false);
+                            log.error(
+                                "auth",
+                                `Origin (${origin}) does not match allowed hosts (${[...allowlist].join(", ") || "none"}), IP: ${clientIP}`
+                            );
+                        }
+                    } catch (e) {
+                        void e;
+                        // Invalid origin url, probably not from browser
+                        callback(null, false);
+                        log.error("auth", `Invalid origin url (${req.headers.origin}), IP: ${clientIP}`);
                     }
                 }
             },

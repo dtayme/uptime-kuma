@@ -122,6 +122,24 @@
                 <div class="form-text"></div>
             </div>
 
+            <!-- WebSocket Allowed Origins -->
+            <div class="mb-4">
+                <label class="form-label" for="webSocketAllowedOrigins">
+                    WebSocket Allowed Origins
+                </label>
+                <input
+                    id="webSocketAllowedOrigins"
+                    v-model="settings.webSocketAllowedOrigins"
+                    class="form-control"
+                    name="webSocketAllowedOrigins"
+                    placeholder="https://status.example.com, https://app.example.com"
+                />
+                <div class="form-text">
+                    Comma-separated origins or hosts that are allowed to open WebSocket connections.
+                    Use this when you have multiple domains or reverse proxy hosts.
+                </div>
+            </div>
+
             <!-- Steam API Key -->
             <div class="mb-4">
                 <label class="form-label" for="steamAPIKey">

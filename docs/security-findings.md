@@ -11,9 +11,12 @@ Progress:
 - [ ] Set `USER node` in release stage or adopt rootless default.
 
 **Finding 2 (Medium): WebSocket origin validation bypass**
-Status: Open
+Status: Mitigated
 Scope: `server/uptime-kuma-server.js`
 Recommendation: validate `Origin` against an allowlist (e.g., configured base URL) and use `x-forwarded-host` when `trustProxy` is enabled. Consider stricter defaults.
+Notes:
+- Implemented allowlist using `primaryBaseURL` plus `webSocketAllowedOrigins`, with a fallback to `Host`/`X-Forwarded-Host` when configuration is missing.
+- Caveat: leaving the allowlist empty keeps the compatibility fallback, which is less strict than a hard allowlist.
 
 **Finding 3 (Medium): Push endpoint token exposure + no rate limit**
 Status: Open
