@@ -34,8 +34,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: Build and push base2-slim image
-        run: npm run build-docker-base-slim
+      - name: Build and push base2-build image
+        run: npm run build-docker-base-build
+
+      - name: Build and push base2-runtime image
+        run: npm run build-docker-base-runtime
 
       - name: Build and push base2-poller image
         run: npm run build-docker-base-poller

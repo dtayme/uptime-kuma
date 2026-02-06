@@ -63,7 +63,7 @@ if (!dryRun) {
         repoNames,
         ["alpha-slim-rootless", ver(version, "slim-rootless")],
         "rootless",
-        "BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-slim"
+        "BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-runtime"
     );
 
     // Build full image (rootless)
@@ -74,7 +74,7 @@ if (!dryRun) {
         repoNames,
         ["alpha-slim", ver(version, "slim")],
         "release",
-        "BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-slim"
+        "BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-runtime"
     );
 
     // Build full image

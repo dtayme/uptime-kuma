@@ -21,8 +21,10 @@ jobs:
             tag: poller-alpha
           - name: base2
             tag: base2
-          - name: base2-slim
-            tag: base2-slim
+          - name: base2-build
+            tag: base2-build
+          - name: base2-runtime
+            tag: base2-runtime
           - name: base2-poller
             tag: base2-poller
           - name: builder-go
