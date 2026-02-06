@@ -39,6 +39,7 @@
         "tsc": "tsc --project ./tsconfig-backend.json",
         "vite-preview-dist": "vite preview --host --config ./config/vite.config.js",
         "build-docker-base": "docker buildx build -f docker/debian-base.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t fognetx/uptime-kuma-distributed:base2 --target base2 . --push",
+        "build-docker-base-poller": "docker buildx build -f docker/debian-base.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t fognetx/uptime-kuma-distributed:base2-poller --target base2-poller . --push",
         "build-docker-base-slim": "docker buildx build -f docker/debian-base.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t fognetx/uptime-kuma-distributed:base2-slim --target base2-slim . --push",
         "build-docker-builder-go": "docker buildx build -f docker/builder-go.dockerfile --platform linux/amd64,linux/arm64,linux/arm/v7 -t fognetx/uptime-kuma-distributed:builder-go . --push",
         "build-docker-nightly-local": "npm run build && docker build -f docker/dockerfile -t fognetx/uptime-kuma-distributed:nightly2 --target nightly .",

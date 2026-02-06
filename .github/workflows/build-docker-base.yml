@@ -37,5 +37,8 @@ jobs:
       - name: Build and push base2-slim image
         run: npm run build-docker-base-slim
 
+      - name: Build and push base2-poller image
+        run: npm run build-docker-base-poller
+
       - name: Build and push base2 image
         run: npm run build-docker-base

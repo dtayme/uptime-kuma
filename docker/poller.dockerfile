@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=fognetx/uptime-kuma-distributed:base2
+ARG BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-poller
 ARG BUILD_BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-slim
 
 ############################################

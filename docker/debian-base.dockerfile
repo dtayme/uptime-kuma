@@ -1,5 +1,4 @@
 # Download Apprise deb package
-ARG ENABLE_APPRISE=1
 FROM node:22-bookworm-slim AS download-apprise
 ARG ENABLE_APPRISE=1
 WORKDIR /app
@@ -80,6 +79,9 @@ RUN rm -rf /usr/lib/node_modules/npm \
     /usr/bin/npm \
     /usr/bin/npx \
     /usr/bin/corepack
+
+# Poller base image (minimal runtime)
+FROM base2-slim-runtime AS base2-poller
 
 # Full Base Image
 # MariaDB, Chromium and fonts
