@@ -1,7 +1,24 @@
 name: Build Docker Base Images
 
 on:
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      build_base2_build:
+        description: "Build base2-build (and base2-slim tag)"
+        type: boolean
+        default: false
+      build_base2_runtime:
+        description: "Build base2-runtime"
+        type: boolean
+        default: false
+      build_base2_poller:
+        description: "Build base2-poller"
+        type: boolean
+        default: false
+      build_base2:
+        description: "Build base2"
+        type: boolean
+        default: false
 
 permissions: {}
 
@@ -9,6 +26,8 @@ jobs:
   build-docker-base:
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    env:
+      BUILD_ALL: ${{ inputs.build_base2_build != true && inputs.build_base2_runtime != true && inputs.build_base2_poller != true && inputs.build_base2 != true }}
     permissions:
       contents: read
       packages: write
@@ -36,6 +55,7 @@ jobs:
 
       # TODO: Evaluate migrating to docker buildx bake to consolidate builds and improve cache sharing.
       - name: Build and push base2-build image
+        if: ${{ env.BUILD_ALL == 'true' || inputs.build_base2_build == true }}
         run: >
           docker buildx build
           -f docker/debian-base.dockerfile
@@ -49,6 +69,7 @@ jobs:
           --push
 
       - name: Build and push base2-runtime image
+        if: ${{ env.BUILD_ALL == 'true' || inputs.build_base2_runtime == true }}
         run: >
           docker buildx build
           -f docker/debian-base.dockerfile
@@ -61,6 +82,7 @@ jobs:
           --push
 
       - name: Build and push base2-poller image
+        if: ${{ env.BUILD_ALL == 'true' || inputs.build_base2_poller == true }}
         run: >
           docker buildx build
           -f docker/debian-base.dockerfile
@@ -73,6 +95,7 @@ jobs:
           --push
 
       - name: Build and push base2 image
+        if: ${{ env.BUILD_ALL == 'true' || inputs.build_base2 == true }}
         run: >
           docker buildx build
           -f docker/debian-base.dockerfile
