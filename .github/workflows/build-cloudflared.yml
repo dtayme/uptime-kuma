@@ -15,7 +15,7 @@ on:
         required: false
         default: "golang.org/x/crypto@v0.45.0"
       go_toolchain:
-        description: "Go toolchain override (e.g. go1.24.12)"
+        description: "Go toolchain override (e.g. go1.24.13)"
         required: false
         default: ""
       cgo_enabled:
