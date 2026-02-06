@@ -7,7 +7,7 @@ const net = require("node:net");
 const http = require("node:http");
 
 /**
- * Simulates non compliant WS Server, doesnt send Sec-WebSocket-Accept header
+ * Simulates a non-compliant WS server; doesn't send the Sec-WebSocket-Accept header
  * @returns {Promise<{server: net.Server, port: number}>} Promise that resolves to the created server and its port
  */
 function nonCompliantWS() {
