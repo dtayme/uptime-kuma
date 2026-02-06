@@ -57,7 +57,7 @@ jobs:
           node-version: 20
 
       - name: Use Go
-        uses: actions/setup-go@f32a50f3b112a7465b8b6100c6d06d3428ac25fc # v6.0.0
+        uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a # v5.2.0
         with:
           go-version: "1.24.x"
 
