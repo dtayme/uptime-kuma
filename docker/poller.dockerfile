@@ -1,9 +1,10 @@
 ARG BASE_IMAGE=fognetx/uptime-kuma-distributed:base2
+ARG BUILD_BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-slim
 
 ############################################
 # Build poller dependencies
 ############################################
-FROM $BASE_IMAGE AS build
+FROM $BUILD_BASE_IMAGE AS build
 USER node
 WORKDIR /app
 

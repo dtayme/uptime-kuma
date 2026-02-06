@@ -1,4 +1,5 @@
 ARG BASE_IMAGE=fognetx/uptime-kuma-distributed:base2
+ARG BUILD_BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-slim
 
 ############################################
 # Build in Golang
@@ -10,7 +11,7 @@ FROM fognetx/uptime-kuma-distributed:builder-go AS build_healthcheck
 ############################################
 # Build in Node.js
 ############################################
-FROM fognetx/uptime-kuma-distributed:base2 AS build
+FROM $BUILD_BASE_IMAGE AS build
 USER node
 WORKDIR /app
 
@@ -51,7 +52,7 @@ USER node
 # Mark as Nightly
 ############################################
 FROM release AS nightly
-RUN npm run mark-as-nightly
+RUN node extra/mark-as-nightly.js
 
 FROM nightly AS nightly-rootless
 USER node
@@ -59,7 +60,7 @@ USER node
 ############################################
 # Build an image for testing pr
 ############################################
-FROM fognetx/uptime-kuma-distributed:base2 AS pr-test2
+FROM $BUILD_BASE_IMAGE AS pr-test2
 WORKDIR /app
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
 
