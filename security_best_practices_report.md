@@ -11,7 +11,7 @@ Results pulled from GitHub CodeQL alerts for `dtayme/uptime-kuma-distributed` an
 SBP-001
 Rule ID: js/disabling-certificate-validation
 Severity: High
-Location: extra/healthcheck.js:12 (script main)
+Location: extra/healthcheck-src/healthcheck.js:12 (script main)
 Evidence:
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 Impact: Disables TLS certificate validation, enabling man-in-the-middle attacks if this script is used against any HTTPS endpoint.
@@ -22,7 +22,7 @@ False positive notes: The file header indicates this script is deprecated but st
 SBP-002
 Rule ID: go/disabled-certificate-check
 Severity: High
-Location: extra/healthcheck.go:27-28 (main)
+Location: extra/healthcheck-src/healthcheck.go:27-28 (main)
 Evidence:
 http.DefaultTransport.(\*http.Transport).TLSClientConfig = &tls.Config{
 InsecureSkipVerify: true,

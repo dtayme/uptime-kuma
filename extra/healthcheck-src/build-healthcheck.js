@@ -9,8 +9,8 @@ if (!platform) {
 
 if (platform === "linux/arm/v7") {
     console.log("Arch: armv7");
-    if (fs.existsSync("./extra/healthcheck-armv7")) {
-        fs.renameSync("./extra/healthcheck-armv7", "./extra/healthcheck");
+    if (fs.existsSync("./extra/healthcheck-src/healthcheck-armv7")) {
+        fs.renameSync("./extra/healthcheck-src/healthcheck-armv7", "./extra/healthcheck");
         console.log("Already built in the host, skip.");
         process.exit(0);
     } else {
@@ -19,10 +19,10 @@ if (platform === "linux/arm/v7") {
         );
     }
 } else {
-    if (fs.existsSync("./extra/healthcheck-armv7")) {
-        fs.rmSync("./extra/healthcheck-armv7");
+    if (fs.existsSync("./extra/healthcheck-src/healthcheck-armv7")) {
+        fs.rmSync("./extra/healthcheck-src/healthcheck-armv7");
     }
 }
 
-const output = childProcess.execSync("go build -x -o ./extra/healthcheck ./extra/healthcheck.go").toString("utf8");
+const output = childProcess.execSync("go build -x -o ./extra/healthcheck ./extra/healthcheck-src/healthcheck.go").toString("utf8");
 console.log(output);
