@@ -22,6 +22,7 @@ COPY --chown=node:node package-lock.json package-lock.json
 COPY . .
 RUN rm -rf node_modules && npm ci --omit=dev
 COPY --chown=node:node --from=build_healthcheck /app/extra/healthcheck /app/extra/healthcheck
+RUN rm -rf /app/extra/healthcheck-src
 RUN mkdir -p ./data
 
 ############################################
