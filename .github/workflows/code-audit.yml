@@ -24,7 +24,7 @@ jobs:
 
       - name: Run code audit
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node extra/auto-code-audit.mjs
 
       - name: Upload report
