@@ -7,7 +7,9 @@ RUN if [ "$ENABLE_APPRISE" = "1" ]; then \
         apt update && \
         apt --yes --no-install-recommends install curl && \
         npm install cheerio semver && \
-        node ./download-apprise.mjs; \
+        node ./download-apprise.mjs && \
+        rm -rf /var/lib/apt/lists/* && \
+        npm cache clean --force; \
     else \
         touch /app/apprise.deb; \
     fi
@@ -43,7 +45,14 @@ RUN if [ "$ENABLE_APPRISE" = "1" ]; then \
             python3-paho-mqtt \
             python3-cryptography \
             python3-urllib3 \
-            python3-certifi && \
+            python3-certifi \
+            python3-pip && \
+        python3 -m pip install --no-cache-dir --break-system-packages --upgrade \
+            cryptography \
+            urllib3 \
+            certifi && \
+        apt --yes purge python3-pip && \
+        rm -rf /root/.cache/pip && \
         rm -rf /var/lib/apt/lists/* && \
         rm -f apprise.deb && \
         apt --yes autoremove; \
