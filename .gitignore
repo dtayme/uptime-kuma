@@ -32,3 +32,4 @@ extra/exe-builder/obj
 .tmp*
 AGENTS.md
 codeql-custom-queries-javascript/
+docs/session-summary-*.md
