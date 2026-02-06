@@ -1,0 +1,119 @@
+name: Build Cloudflared (Patched)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Cloudflared tag to build"
+        required: true
+        default: "2026.2.0"
+      release_tag:
+        description: "Release tag to publish assets (defaults to cloudflared-<tag>)"
+        required: false
+      module_overrides:
+        description: "Comma-separated module@version overrides"
+        required: false
+        default: "golang.org/x/crypto@v0.43.0"
+      go_toolchain:
+        description: "Go toolchain override (e.g. go1.24.12)"
+        required: false
+        default: ""
+      cgo_enabled:
+        description: "CGO_ENABLED override (e.g. 0 or 1)"
+        required: false
+        default: "0"
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: amd64
+            goarch: amd64
+            goarm: ""
+            asset: cloudflared-linux-amd64
+          - name: arm64
+            goarch: arm64
+            goarm: ""
+            asset: cloudflared-linux-arm64
+          - name: armv7
+            goarch: arm
+            goarm: "7"
+            asset: cloudflared-linux-arm
+
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with: { persist-credentials: false }
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+        with:
+          node-version: 20
+
+      - name: Use Go
+        uses: actions/setup-go@f32a50f3b112a7465b8b6100c6d06d3428ac25fc # v6.0.0
+        with:
+          go-version: "1.24.x"
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends make capnproto
+
+      - name: Resolve release tag
+        id: release
+        run: |
+          tag="${{ inputs.release_tag }}"
+          if [ -z "$tag" ]; then
+            tag="cloudflared-${{ inputs.tag }}"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Build cloudflared
+        env:
+          MODULE_OVERRIDES: ${{ inputs.module_overrides }}
+        run: |
+          module_args=""
+          if [ -n "$MODULE_OVERRIDES" ]; then
+            IFS=',' read -ra modules <<< "$MODULE_OVERRIDES"
+            for module in "${modules[@]}"; do
+              module="$(echo "$module" | xargs)"
+              if [ -n "$module" ]; then
+                module_args="$module_args --module $module"
+              fi
+            done
+          fi
+
+          node extra/build-cloudflared.mjs \
+            --tag "${{ inputs.tag }}" \
+            --goos linux \
+            --goarch "${{ matrix.goarch }}" \
+            --goarm "${{ matrix.goarm }}" \
+            --cgo-enabled "${{ inputs.cgo_enabled }}" \
+            --go-toolchain "${{ inputs.go_toolchain }}" \
+            --out "dist/${{ matrix.asset }}" \
+            $module_args
+
+      - name: Generate checksum
+        run: |
+          sha256sum "dist/${{ matrix.asset }}" > "dist/${{ matrix.asset }}.sha256"
+
+      - name: Publish release assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${{ steps.release.outputs.tag }}"
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" --notes "Patched cloudflared binaries for Uptime Kuma builds."
+          fi
+
+          gh release upload "$tag" \
+            "dist/${{ matrix.asset }}" \
+            "dist/${{ matrix.asset }}.sha256" \
+            --clobber
