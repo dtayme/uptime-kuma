@@ -14,6 +14,14 @@ jobs:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with: { persist-credentials: false }
 
+      - name: Set up Go
+        uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a # v5.2.0
+        with:
+          go-version: "1.23.8"
+
+      - name: Prebuild healthcheck for armv7
+        run: GOOS=linux GOARCH=arm GOARM=7 go build -x -o ./extra/healthcheck-armv7 ./extra/healthcheck-src/healthcheck.go
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
 
@@ -32,6 +40,8 @@ jobs:
           -f docker/builder-go.dockerfile
           --platform linux/amd64,linux/arm64,linux/arm/v7
           -t fognetx/uptime-kuma-distributed:builder-go
+          --cache-from type=gha
+          --cache-to type=gha,mode=max
           .
           --push
 
