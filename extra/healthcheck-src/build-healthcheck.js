@@ -24,5 +24,7 @@ if (platform === "linux/arm/v7") {
     }
 }
 
-const output = childProcess.execSync("go build -x -o ./extra/healthcheck ./extra/healthcheck-src/healthcheck.go").toString("utf8");
+const output = childProcess
+    .execSync("go build -x -o ./extra/healthcheck ./extra/healthcheck-src/healthcheck.go")
+    .toString("utf8");
 console.log(output);
