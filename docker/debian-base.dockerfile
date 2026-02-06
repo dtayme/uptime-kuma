@@ -112,8 +112,13 @@ RUN set -eux; \
     done; \
     if [ -n "$remove_pkgs" ]; then \
         apt --yes purge $remove_pkgs; \
-        apt --yes autoremove; \
     fi; \
+    apt --yes autoremove --purge; \
+    rc_pkgs="$(dpkg -l | awk '$1=="rc"{print $2}')" ; \
+    if [ -n "$rc_pkgs" ]; then \
+        apt --yes purge $rc_pkgs; \
+    fi; \
+    apt --yes autoremove --purge; \
     rm -rf /var/lib/apt/lists/* /root/.cache/pip /usr/local/lib/python3*; \
     rm -f /usr/local/bin/apprise; \
     rm -f /usr/local/bin/cloudflared
