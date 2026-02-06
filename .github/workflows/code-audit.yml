@@ -28,7 +28,7 @@ jobs:
         run: node extra/auto-code-audit.mjs
 
       - name: Upload report
-        uses: actions/upload-artifact@a5c0b6f4f5b4c9fb7c5f226f5f3b4a02dbf0d7f1 # v4.3.0
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
           name: auto-code-audit
           path: docs/auto_code_audit.md
