@@ -13,4 +13,7 @@ buildDist();
 buildImage(repoNames, [ "nightly2-rootless" ], "nightly-rootless");
 
 // Build full image
-buildImage(repoNames, [ "nightly2" ], "nightly");
+buildImage(repoNames, [ "nightly2", "centralserver-nightly" ], "nightly");
+
+// Build poller image
+buildImage(repoNames, [ "poller-nightly" ], "poller", "", "docker/poller.dockerfile");
