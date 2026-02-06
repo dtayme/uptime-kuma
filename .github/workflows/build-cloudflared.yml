@@ -17,7 +17,7 @@ on:
       go_toolchain:
         description: "Go toolchain override (e.g. go1.24.13)"
         required: false
-        default: ""
+        default: "go1.24.13"
       cgo_enabled:
         description: "CGO_ENABLED override (e.g. 0 or 1)"
         required: false
