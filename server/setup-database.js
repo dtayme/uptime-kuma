@@ -10,10 +10,10 @@ const mysql = require("mysql2/promise");
 
 /**
  * Reads a configuration value from an environment variable or a Docker secrets file.
- * If both the direct env var and the _FILE variant are set, an error is thrown.
+ * If both the direct environment variable and the _FILE variant are set, an error is thrown.
  * @param {string} envName The base name of the environment variable (e.g., "UPTIME_KUMA_DB_PASSWORD")
- * @returns {string|undefined} The value from the env var, file contents (trimmed), or undefined if neither is set
- * @throws {Error} If both the direct env var and the _FILE variant are set
+ * @returns {string|undefined} The value from the environment variable, file contents (trimmed), or undefined if neither is set
+ * @throws {Error} If both the direct environment variable and the _FILE variant are set
  */
 function getEnvOrFile(envName) {
     const directValue = process.env[envName];
