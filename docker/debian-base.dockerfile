@@ -1,23 +1,7 @@
-# Download Apprise deb package
-FROM node:22-bookworm-slim AS download-apprise
-ARG APPRISE_DEB_VERSION=1.9.3-1
-ARG ENABLE_APPRISE=1
-WORKDIR /app
-COPY ./extra/download-apprise.mjs ./download-apprise.mjs
-RUN if [ "$ENABLE_APPRISE" = "1" ]; then \
-        apt update && \
-        apt --yes --no-install-recommends install curl && \
-        npm install cheerio semver && \
-        APPRISE_DEB_VERSION="$APPRISE_DEB_VERSION" node ./download-apprise.mjs && \
-        rm -rf /var/lib/apt/lists/* && \
-        npm cache clean --force; \
-    else \
-        touch /app/apprise.deb; \
-    fi
-
 # Base Image (Slim)
 # If the image changed, the second stage image should be changed too
 FROM node:22-bookworm-slim AS base2-slim
+ARG APPRISE_PIP_VERSION=1.9.7
 ARG ENABLE_APPRISE=1
 ARG TARGETARCH
 ARG TARGETPLATFORM
@@ -34,20 +18,16 @@ RUN apt update && \
     rm -rf /var/lib/apt/lists/* && \
     apt --yes autoremove
 
-# apprise = for notifications (Install from the deb package, as the stable one is too old) (workaround for #4867)
-# Switching to testing repo is no longer working, as the testing repo is not bookworm anymore.
-# python3-paho-mqtt (#4859)
-# TODO: no idea how to delete the deb file after installation as it becomes a layer already
-COPY --from=download-apprise /app/apprise.deb ./apprise.deb
+# apprise = for notifications (Install via pip to avoid outdated Debian Python packages)
+# paho-mqtt (#4859)
 RUN if [ "$ENABLE_APPRISE" = "1" ]; then \
         apt update && \
         apt --yes --no-install-recommends install \
-            ./apprise.deb \
-            python3-paho-mqtt \
-            python3-cryptography \
-            python3-urllib3 \
-            python3-certifi \
+            python3 \
             python3-pip && \
+        python3 -m pip install --no-cache-dir --break-system-packages \
+            "apprise==${APPRISE_PIP_VERSION}" \
+            paho-mqtt && \
         python3 -m pip install --no-cache-dir --break-system-packages --upgrade \
             cryptography \
             urllib3 \
@@ -55,10 +35,7 @@ RUN if [ "$ENABLE_APPRISE" = "1" ]; then \
         apt --yes purge python3-pip && \
         rm -rf /root/.cache/pip && \
         rm -rf /var/lib/apt/lists/* && \
-        rm -f apprise.deb && \
         apt --yes autoremove; \
-    else \
-        rm -f apprise.deb; \
     fi
 
 # Install cloudflared
@@ -92,6 +69,20 @@ RUN rm -rf /usr/lib/node_modules/npm \
 
 # Poller base image (minimal runtime)
 FROM base2-slim-runtime AS base2-poller
+RUN set -eux; \
+    remove_pkgs=""; \
+    for pkg in apprise python3-paho-mqtt python3-cryptography python3-urllib3 python3-certifi python3; do \
+        if dpkg -s "$pkg" >/dev/null 2>&1; then \
+            remove_pkgs="$remove_pkgs $pkg"; \
+        fi; \
+    done; \
+    if [ -n "$remove_pkgs" ]; then \
+        apt --yes purge $remove_pkgs; \
+        apt --yes autoremove; \
+    fi; \
+    rm -rf /var/lib/apt/lists/* /root/.cache/pip /usr/local/lib/python3*; \
+    rm -f /usr/local/bin/apprise; \
+    rm -f /usr/local/bin/cloudflared
 
 # Full Base Image
 # MariaDB, Chromium and fonts
