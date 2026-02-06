@@ -2,6 +2,7 @@
 ############################################
 # Build in Golang
 # Run npm run build-healthcheck-armv7 in the host first, another it will be super slow where it is building the armv7 healthcheck
+# (writes extra/healthcheck-src/healthcheck-armv7)
 ############################################
 FROM golang:1.23.8-bookworm
 WORKDIR /app
@@ -16,6 +17,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt --yes --no-install-recommends install curl && \
     curl -sL https://deb.nodesource.com/setup_22.x | bash && \
     apt --yes --no-install-recommends install nodejs && \
+    if [ -f ./extra/healthcheck-src/healthcheck-armv7 ]; then mv ./extra/healthcheck-src/healthcheck-armv7 ./extra/healthcheck-armv7; fi && \
     node ./extra/healthcheck-src/build-healthcheck.js $TARGETPLATFORM && \
     apt --yes purge nodejs curl && \
     apt --yes autoremove

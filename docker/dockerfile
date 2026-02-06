@@ -4,6 +4,7 @@ ARG BUILD_BASE_IMAGE=fognetx/uptime-kuma-distributed:base2-build
 ############################################
 # Build in Golang
 # Run npm run build-healthcheck-armv7 in the host first, otherwise it will be super slow where it is building the armv7 healthcheck
+# (writes extra/healthcheck-src/healthcheck-armv7)
 # Check file: builder-go.dockerfile
 ############################################
 FROM fognetx/uptime-kuma-distributed:builder-go AS build_healthcheck

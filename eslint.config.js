@@ -115,6 +115,7 @@ module.exports = [
             "extra/healthcheck.exe",
             "extra/healthcheck",
             "extra/healthcheck-armv7",
+            "extra/healthcheck-src/healthcheck-armv7",
             "extra/exe-builder/bin",
             "extra/exe-builder/obj",
             ".vs",

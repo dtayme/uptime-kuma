@@ -13,5 +13,5 @@ Files:
 Build outputs:
 
 - `./extra/healthcheck` (binary) is produced by `build-healthcheck.js`.
-- `./extra/healthcheck-armv7` (optional) can be produced on the host to speed
-  up ARMv7 builds.
+- `./extra/healthcheck-src/healthcheck-armv7` (optional) can be produced on the
+  host to speed up ARMv7 builds.
